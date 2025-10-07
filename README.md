@@ -68,4 +68,4 @@ Bạn cần cài đặt:
 2.  **Commit:** `git commit -m "feat: Thêm tính năng [mô tả ngắn gọn]"`
 3.  **Push:** `git push origin feature/ten-tinh-nang`
 4.  **Tạo Pull Request (PR)**: Yêu cầu hợp nhất vào nhánh `main` và chờ kiểm duyệt.
-git remote add origin(https://github.com/MinhNghia2610/ChefBot)
+git remote add origin(https://github.com/MinhNghia2610/WEB_RESTAURANT_01)
