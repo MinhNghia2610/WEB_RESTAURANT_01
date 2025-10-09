@@ -24,7 +24,7 @@ const HeroSection = () => {
             onClick={() => { /* logic chuyển đến trang đặt hàng */ }}
             className="mt-6 px-10 py-3 bg-red-600 hover:bg-red-700 text-white text-lg font-bold rounded-full shadow-lg transform transition duration-300 hover:scale-105"
           >
-             ĐẶT MÓN ONLINE
+             ĐẶT BÀN ONLINE
           </button>
         </div>
         
