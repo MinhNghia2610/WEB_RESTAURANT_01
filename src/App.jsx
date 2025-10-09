@@ -6,7 +6,8 @@ import CartSidebar from './components/CartSidebar';
 import StorySection from './components/StorySection'; 
 import Testimonials from './components/Testimonials'; 
 import Footer from './components/Footer';
-import AuthModal from './components/AuthModal'; // IMPORT MỚI: Auth Modal
+import ChatBot from './components/ChatBot'; // IMPORT MỚI: POP UP CHAT BOT
+import AuthModal from './components/AuthModal';
 
 // Imports các trang nội dung (điều chỉnh tên file theo cấu trúc mới)
 import GioiThieuPage from './pages/AboutUs'; 
@@ -28,7 +29,7 @@ const getPage = () => {
             return 'dat-ban';
         default:
             return 'trang-chu';
-    }
+    }   
 };
 
 function App() {
@@ -110,7 +111,7 @@ function App() {
 
             {/* Footer */}
             <Footer /> 
-
+            <ChatBot />
         </div>
     );
 }
