@@ -28,7 +28,7 @@ const HeroSection = () => {
           <h1 className="text-7xl md:text-8xl font-bold mt-3 mb-10 tracking-widest uppercase">
             L'ESSENCE
           </h1>
-<<<<<<< HEAD
+
           {/* Nút ĐẶT HÀNG NGAY - CTA */}
           <button
             onClick={() => { /* logic chuyển đến trang đặt hàng */ }}
@@ -36,7 +36,7 @@ const HeroSection = () => {
           >
              ĐẶT BÀN ONLINE
           </button>
-=======
+
           
           {/* Tiêu đề Phụ 2: Slogan (Tiếng Việt) */}
           <p className="text-2xl font-light italic font-serif text-gray-100 mb-12">
@@ -50,7 +50,6 @@ const HeroSection = () => {
           >
             ĐẶT BÀN
           </Link>
->>>>>>> ad551855fe4e7c875e4ec807b564c535c80d8db2
         </div>
         
         {/* Phần MenuStrip đã được loại bỏ, chỉ còn nội dung chính */}
