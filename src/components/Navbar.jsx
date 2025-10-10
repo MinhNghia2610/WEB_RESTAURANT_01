@@ -1,151 +1,71 @@
-import React, { useState } from 'react';
-import { ShoppingCartIcon } from '@heroicons/react/24/outline';
-import { useCart } from '../context/CartContext'; 
-import CartSidebar from './CartSidebar';
-import { Menu, X } from 'lucide-react'; // Sử dụng Lucide Icons cho Mobile Menu
+import React from 'react';
+import { Link } from 'react-router-dom'; // <--- Đã thêm import Link
 
-// THAY ĐỔI: Navbar bây giờ nhận setIsAuthModalOpen
-const Navbar = ({ setIsCartOpen, setIsAuthModalOpen }) => { 
-    // Thay đổi: Đặt tên mục "Đặt bàn" để khớp với logic routing
-    const navItems = [
-        { name: 'Trang chủ', hash: '#trang-chu' }, 
-        { name: 'Giới thiệu', hash: '#gioi-thieu' }, 
-        { name: 'Thực đơn', hash: '#thuc-don' }, 
-        { name: 'Bài viết', hash: '#bai-viet' }
-    ];
-    
-    // Thêm mục Đặt Bàn dưới dạng button hoặc xử lý đặc biệt
-    const reservationHash = '#dat-ban';
+const Navbar = ({ setIsCartOpen, setIsAuthModalOpen, currentPage }) => {
 
-    const { totalItems } = useCart(); 
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State quản lý menu mobile
-
-    // Hàm xử lý click Đặt Bàn (chuyển hướng)
-    const handleReservationClick = () => {
-        window.location.hash = reservationHash;
-        setIsMobileMenuOpen(false); // Đóng menu nếu đang ở mobile
-    };
-    
-    // Hàm xử lý mở Modal Auth
-    const handleAuthClick = () => {
-        if (setIsAuthModalOpen) {
-            setIsAuthModalOpen(true);
-        }
-        setIsMobileMenuOpen(false); // Đảm bảo đóng mobile menu khi mở modal
+    // Hàm tạo class CSS cho Link để đánh dấu trang hiện tại
+    const getLinkClass = (path) => {
+        const baseClasses = "hover:text-amber-500 transition duration-300";
+        const activeClass = "text-amber-500 font-bold border-b-2 border-amber-500 pb-1"; // Thêm border bottom cho hiệu ứng nổi bật
+        const inactiveClass = "text-gray-300";
+        
+        // Kiểm tra xem path có phải là trang hiện tại không
+        return `${baseClasses} ${currentPage === path ? activeClass : inactiveClass}`;
     };
 
-    // NOTE: Component CartSidebar KHÔNG NÊN được gọi ở đây. Nó nên được gọi trong App.jsx
-    // Thay vì đó, Navbar nhận setIsCartOpen để mở Sidebar.
+    return (
+        <header className="sticky top-0 z-50 bg-gray-900 bg-opacity-95 shadow-lg">
+            <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                
+                {/* LOGO - Chuyển thành Link về trang chủ */}
+                <Link to="/" className="text-2xl font-serif text-amber-500 tracking-wider hover:text-amber-600 transition duration-300">
+                    L'ESSENCE
+                </Link>
 
-    return (
-        <>
-            {/* Thanh Header chính */}
-            <header className="bg-black/80 fixed w-full top-0 z-50 shadow-lg backdrop-blur-sm"> 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        
-                        {/* Logo */}
-                        <a href="#trang-chu" className="flex-shrink-0">
-                            <span className="text-white text-2xl font-bold tracking-widest hover:text-red-500 transition duration-300">L2 Food</span>
-                        </a>
+                {/* MENU CHÍNH - Đã chuyển từ <a> sang <Link> */}
+                <div className="hidden md:flex space-x-8 text-sm font-medium uppercase">
+                    <Link to="/" className={getLinkClass('/')}>
+                        Trang Chủ
+                    </Link>
+                    <Link to="/thuc-don" className={getLinkClass('/thuc-don')}>
+                        Thực Đơn
+                    </Link>
+                    <Link to="/dat-ban" className={getLinkClass('/dat-ban')}>
+                        Đặt Bàn
+                    </Link>
+                    <Link to="/gioi-thieu" className={getLinkClass('/gioi-thieu')}>
+                        Giới Thiệu
+                    </Link>
+                </div>
 
-                        {/* Nav Items (Desktop) */}
-                        <nav className="hidden md:flex space-x-6 items-center">
-                            {navItems.map((item) => (
-                                <a 
-                                    key={item.name} 
-                                    href={item.hash}
-                                    className="px-3 py-2 rounded-md text-sm font-medium transition duration-150 text-white hover:text-red-500 hover:bg-white/10"
-                                >
-                                    {item.name}
-                                </a>
-                            ))}
-                            {/* Nút Đặt Bàn (Desktop) */}
-                             <button
-                                onClick={handleReservationClick}
-                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition duration-150 shadow-lg transform hover:scale-[1.03]"
-                            >
-                                Đặt Bàn
-                            </button>
-                        </nav>
-
-                        {/* Giỏ hàng, Auth, và Mobile Button */}
-                        <div className="flex items-center space-x-3">
-                            
-                            {/* Biểu tượng Giỏ hàng */}
-                            <button 
-                                onClick={() => setIsCartOpen(true)}
-                                className="relative text-white hover:text-red-500 transition duration-150 p-2 rounded-full hover:bg-white/10"
-                                aria-label="Mở Giỏ hàng"
-                            >
-                                <ShoppingCartIcon className="h-6 w-6" />
-                                
-                                {totalItems > 0 && ( 
-                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white ring-2 ring-black/80">
-                                        {totalItems}
-                                    </span>
-                                )}
-                            </button>
-
-                            {/* Nút Mobile Menu */}
-                            <button
-                                className="md:hidden p-2 text-white hover:text-red-500"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                aria-label="Toggle menu"
-                            >
-                                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                            </button>
-
-                            {/* Auth Buttons (Desktop) */}
-                            <button 
-                                onClick={handleAuthClick} // THAY ĐỔI: Thêm onClick để mở Auth Modal
-                                className="hidden sm:block text-white text-sm hover:text-gray-300"
-                            >
-                                Đăng nhập
-                            </button>
-                            <button 
-                                onClick={handleAuthClick} // THAY ĐỔI: Thêm onClick để mở Auth Modal
-                                className="hidden sm:block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-medium transition duration-150"
-                            >
-                                Đăng ký
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile Menu (Dropdown) */}
-                <div className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-700/50 bg-black/90">
-                        {navItems.map((item) => (
-                            <a 
-                                key={item.name}
-                                href={item.hash} 
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-200 hover:bg-gray-700 hover:text-white transition duration-150"
-                            >
-                                {item.name}
-                            </a>
-                        ))}
-                        {/* Nút Đặt Bàn (Mobile) */}
-                        <button
-                            onClick={handleReservationClick}
-                            className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700 transition duration-150 mt-1"
-                        >
-                            Đặt Bàn Ngay
-                        </button>
-                        <button 
-                            onClick={handleAuthClick} // THAY ĐỔI: Thêm onClick để mở Auth Modal
-                            className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-gray-200 hover:bg-gray-700 hover:text-white"
-                        >Đăng nhập</button>
-                        <button 
-                            onClick={handleAuthClick} // THAY ĐỔI: Thêm onClick để mở Auth Modal
-                            className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-white bg-red-500 hover:bg-red-600 text-center"
-                        >Đăng ký</button>
-                    </div>
-                </div>
-            </header>
-        </>
-    );
+                {/* CÁC NÚT CHỨC NĂNG (Đăng nhập & Giỏ hàng) - Giữ nguyên là <button> */}
+                <div className="flex items-center space-x-4">
+                    <button 
+                        onClick={() => setIsAuthModalOpen(true)}
+                        className="text-gray-300 hover:text-amber-500 transition duration-300 p-2 rounded-full hidden sm:block"
+                        aria-label="Đăng nhập"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.938 13.938 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </button>
+                    <button 
+                        onClick={() => setIsCartOpen(true)}
+                        className="relative text-gray-300 hover:text-amber-500 transition duration-300 p-2 rounded-full"
+                        aria-label="Giỏ hàng"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        {/* Ví dụ về số lượng món hàng trong giỏ */}
+                        <span className="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                            3
+                        </span>
+                    </button>
+                </div>
+            </nav>
+        </header>
+    );
 };
 
 export default Navbar;

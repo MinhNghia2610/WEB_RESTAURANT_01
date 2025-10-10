@@ -4,4 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Không còn các quy tắc #root, .logo, v.v. */
+/* Đặt font Inter là chính, Roboto là dự phòng cho Tiếng Việt */
+body {
+  font-family: Inter, Roboto, sans-serif;
+  background-color: #f7f7f7;
+}
+
+/* Các quy tắc CSS toàn cục khác có thể thêm vào đây */

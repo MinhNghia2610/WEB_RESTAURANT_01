@@ -18,9 +18,10 @@ const AuthModal = ({ isOpen, onClose }) => {
         setFeedbackMessage('');
         const formType = isLoginView ? 'Đăng nhập' : 'Đăng ký';
         
-        // Chỉ hiển thị thông báo thành công và đóng modal sau 2 giây
+        // Hiển thị thông báo thành công
         setFeedbackMessage(`${formType} thành công (Tĩnh)!`);
 
+        // Đóng modal sau 2 giây
         setTimeout(() => {
             onClose();
             setFeedbackMessage('');
@@ -31,7 +32,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     // Form Đăng nhập
     const LoginForm = () => (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <h2 className="text-3xl font-bold text-center text-gray-800">Đăng Nhập</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-800 font-serif">Đăng Nhập</h2>
             {feedbackMessage && (
                 <div className="bg-green-100 text-green-700 p-3 rounded-lg text-sm font-medium">
                     {feedbackMessage}
@@ -46,7 +47,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                         type="email"
                         required
                         placeholder="Email"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition duration-150"
                     />
                 </div>
             </div>
@@ -59,13 +60,15 @@ const AuthModal = ({ isOpen, onClose }) => {
                         type="password"
                         required
                         placeholder="Mật khẩu"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition duration-150"
                     />
                 </div>
             </div>
             <button
                 type="submit"
-                className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-150 transform hover:scale-[1.01]"
+                // Nút chính: màu Amber (hổ phách) để đồng bộ với theme
+                className="w-full py-3 bg-amber-600 text-gray-900 font-semibold rounded-lg shadow-md 
+                           hover:bg-amber-700 transition duration-150 transform hover:scale-[1.01] active:scale-[0.99] active:shadow-sm"
             >
                 Đăng Nhập
             </button>
@@ -74,7 +77,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 <button
                     type="button"
                     onClick={() => { setIsLoginView(false); setFeedbackMessage(''); }}
-                    className="text-red-600 hover:text-red-700 font-medium transition duration-150"
+                    className="text-amber-600 hover:text-amber-700 font-medium transition duration-150"
                 >
                     Đăng ký ngay
                 </button>
@@ -85,7 +88,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     // Form Đăng ký
     const RegisterForm = () => (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <h2 className="text-3xl font-bold text-center text-gray-800">Đăng Ký</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-800 font-serif">Đăng Ký</h2>
              {feedbackMessage && (
                 <div className="bg-green-100 text-green-700 p-3 rounded-lg text-sm font-medium">
                     {feedbackMessage}
@@ -100,7 +103,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                         type="text"
                         required
                         placeholder="Tên người dùng"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition duration-150"
                     />
                 </div>
             </div>
@@ -113,7 +116,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                         type="email"
                         required
                         placeholder="Email"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition duration-150"
                     />
                 </div>
             </div>
@@ -127,13 +130,15 @@ const AuthModal = ({ isOpen, onClose }) => {
                         required
                         placeholder="Mật khẩu (tối thiểu 6 ký tự)"
                         minLength="6"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 transition duration-150"
                     />
                 </div>
             </div>
             <button
                 type="submit"
-                className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-150 transform hover:scale-[1.01]"
+                // Nút chính: màu Amber (hổ phách) để đồng bộ với theme
+                className="w-full py-3 bg-amber-600 text-gray-900 font-semibold rounded-lg shadow-md 
+                           hover:bg-amber-700 transition duration-150 transform hover:scale-[1.01] active:scale-[0.99] active:shadow-sm"
             >
                 Đăng Ký
             </button>
@@ -142,7 +147,7 @@ const AuthModal = ({ isOpen, onClose }) => {
                 <button
                     type="button"
                     onClick={() => { setIsLoginView(true); setFeedbackMessage(''); }}
-                    className="text-red-600 hover:text-red-700 font-medium transition duration-150"
+                    className="text-amber-600 hover:text-amber-700 font-medium transition duration-150"
                 >
                     Đăng nhập
                 </button>
@@ -158,7 +163,7 @@ const AuthModal = ({ isOpen, onClose }) => {
         >
             {/* Modal Content */}
             <div 
-                className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-all duration-300"
+                className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-all duration-300 scale-100"
                 onClick={(e) => e.stopPropagation()} // Ngăn chặn click lan truyền
             >
                 {/* Nút Đóng */}
