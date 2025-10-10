@@ -13,7 +13,7 @@ const ReservationPage = () => {
         notes: ''
     });
 
-    // State để hiển thị thông báo và dữ liệu đã đặt
+    // State để hiển thị thông báo và dữ liệu đã đặt (Tĩnh)
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [submittedData, setSubmittedData] = useState(null);
 
@@ -23,15 +23,15 @@ const ReservationPage = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Xử lý submit form
+    // Xử lý submit form (Chỉ xử lý cục bộ, KHÔNG gửi lên Database/Server)
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Lưu dữ liệu đã submit (tĩnh, không gửi lên server)
+        // --- LOGIC XỬ LÝ TĨNH (STATIC) ---
         setSubmittedData(formData);
         setIsSubmitted(true);
         
-        // Reset form sau 3 giây để người dùng có thể đặt tiếp
+        // Reset form sau 5 giây
         setTimeout(() => {
             setIsSubmitted(false);
             setFormData({
@@ -47,44 +47,55 @@ const ReservationPage = () => {
     };
 
     // Hàm tiện ích để tạo input field
-    const InputField = ({ label, name, type = 'text', icon: Icon, min, max }) => (
-        <div className="relative mb-6">
-            <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                {label}
-            </label>
-            {Icon && (
-                <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 mt-2" />
-            )}
-            <input
-                id={name}
-                name={name}
-                type={type}
-                value={formData[name]}
-                onChange={handleChange}
-                required
-                min={min}
-                max={max}
-                className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150 ease-in-out placeholder-gray-500 ${Icon ? 'pl-10' : 'pl-4'} mt-1`}
-                placeholder={`Nhập ${label.toLowerCase()}`}
-            />
-        </div>
-    );
+    const InputField = ({ label, name, type = 'text', icon: Icon, min, max }) => {
+        // Xử lý giá trị ngày/giờ để tránh cảnh báo React về controlled input
+        const inputValue = name in formData ? formData[name] : '';
+
+        return (
+            <div className="relative mb-6">
+                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                    {label}
+                </label>
+                {Icon && (
+                    <Icon className="absolute left-3 top-[37px] w-5 h-5 text-gray-400" />
+                )}
+                <input
+                    id={name}
+                    name={name}
+                    type={type}
+                    value={inputValue}
+                    onChange={handleChange}
+                    required
+                    min={min}
+                    max={max}
+                    // Đã thay đổi màu focus:ring-red-600/border-red-600 thành focus:ring-amber-600/border-amber-600
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-600 focus:border-amber-600 transition duration-150 ease-in-out placeholder-gray-500 ${Icon ? 'pl-10' : 'pl-4'} mt-1 appearance-none`}
+                    placeholder={`Nhập ${label.toLowerCase()}`}
+                />
+            </div>
+        );
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-inter">
+            {/* Tailwind CSS Script for Inter font and general styling */}
+            <script src="https://cdn.tailwindcss.com"></script>
+
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
                     <h2 className="text-5xl font-extrabold text-gray-900 mb-2">
-                        Đặt Bàn Dễ Dàng
+                        ĐẶT BÀN ONLINE
                     </h2>
                     <p className="text-xl text-gray-600">
-                        Chúng tôi mong được chào đón bạn. Vui lòng điền thông tin chi tiết của bạn.
+                        Form chỉ xử lý dữ liệu cục bộ và hiển thị kết quả thành công.
                     </p>
                 </div>
 
                 <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100">
+                    
+                    {/* --- HIỂN THỊ KHI ĐẶT THÀNH CÔNG (TĨNH) --- */}
                     {isSubmitted ? (
-                        <div className="text-center p-8 bg-green-50 rounded-xl">
+                        <div className="text-center p-8 bg-green-50 rounded-xl animate-fadeIn">
                             <svg className="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
@@ -92,26 +103,33 @@ const ReservationPage = () => {
                                 Đặt Bàn Thành Công!
                             </h3>
                             <p className="text-gray-700 mb-6">
-                                Cảm ơn bạn, đơn đặt bàn của bạn đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận sớm.
+                                Cảm ơn bạn, dữ liệu đã được ghi nhận cục bộ.
                             </p>
                             
-                            <div className="text-left inline-block bg-white p-6 rounded-lg shadow-inner">
-                                <h4 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">
-                                    Chi tiết đặt bàn (Tĩnh)
-                                </h4>
-                                <p><strong>Tên:</strong> {submittedData.name}</p>
-                                <p><strong>Liên hệ:</strong> {submittedData.phone} / {submittedData.email}</p>
-                                <p><strong>Ngày & Giờ:</strong> {submittedData.date} lúc {submittedData.time}</p>
-                                <p><strong>Số lượng khách:</strong> {submittedData.guests}</p>
-                                {submittedData.notes && <p><strong>Ghi chú:</strong> {submittedData.notes}</p>}
-                            </div>
+                            {submittedData && (
+                                <div className="text-left inline-block bg-white p-6 rounded-lg shadow-inner border border-gray-200">
+                                    <h4 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">
+                                        Chi tiết đặt bàn (Cục bộ)
+                                    </h4>
+                                    <p><strong>Tên:</strong> {submittedData.name}</p>
+                                    <p><strong>Ngày & Giờ:</strong> {submittedData.date} lúc {submittedData.time}</p>
+                                    <p><strong>Số lượng khách:</strong> {submittedData.guests}</p>
+                                    <p><strong>Liên hệ:</strong> {submittedData.phone} / {submittedData.email}</p>
+                                    {submittedData.notes && <p><strong>Ghi chú:</strong> {submittedData.notes}</p>}
+                                </div>
+                            )}
                             
-                            <p className="mt-4 text-sm text-gray-500">
-                                (Lưu ý: Dữ liệu này không được lưu trữ vĩnh viễn vì không sử dụng database.)
+                            <p className="mt-4 text-sm text-red-500">
+                                (Lưu ý: Dữ liệu này KHÔNG được lưu trữ vĩnh viễn trên database.)
+                            </p>
+                            <p className="mt-1 text-sm text-gray-500">
+                                (Hệ thống sẽ tự động trở về form đặt bàn trong vài giây)
                             </p>
                         </div>
                     ) : (
+                        // --- FORM ĐẶT BÀN ---
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            
                             {/* Thông tin liên hệ */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <InputField label="Họ và Tên" name="name" icon={User} />
@@ -123,8 +141,12 @@ const ReservationPage = () => {
                             
                             {/* Chi tiết đặt bàn */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <InputField label="Chọn Ngày" name="date" type="date" icon={Calendar} 
-                                    min={new Date().toISOString().split('T')[0]} // Ngày tối thiểu là ngày hiện tại
+                                <InputField 
+                                    label="Chọn Ngày" 
+                                    name="date" 
+                                    type="date" 
+                                    icon={Calendar} 
+                                    min={new Date().toISOString().split('T')[0]} 
                                 />
                                 <InputField label="Chọn Giờ" name="time" type="time" icon={Clock} />
                                 
@@ -133,7 +155,7 @@ const ReservationPage = () => {
                                     <label htmlFor="guests" className="block text-sm font-medium text-gray-700 mb-1">
                                         Số lượng khách
                                     </label>
-                                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 mt-2" />
+                                    <Users className="absolute left-3 top-[37px] w-5 h-5 text-gray-400" />
                                     <input
                                         id="guests"
                                         name="guests"
@@ -142,8 +164,8 @@ const ReservationPage = () => {
                                         onChange={handleChange}
                                         required
                                         min="1"
-                                        max="10" // Giả sử tối đa 10 khách/bàn
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150 ease-in-out placeholder-gray-500 mt-1"
+                                        max="10" 
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-600 focus:border-amber-600 transition duration-150 ease-in-out placeholder-gray-500 mt-1"
                                     />
                                 </div>
                             </div>
@@ -159,7 +181,7 @@ const ReservationPage = () => {
                                     rows="3"
                                     value={formData.notes}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500 transition duration-150 ease-in-out placeholder-gray-500"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-600 focus:border-amber-600 transition duration-150 ease-in-out placeholder-gray-500"
                                     placeholder="Nhập ghi chú của bạn..."
                                 ></textarea>
                             </div>
@@ -168,7 +190,8 @@ const ReservationPage = () => {
                             <div className="pt-4">
                                 <button
                                     type="submit"
-                                    className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl shadow-lg text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200 ease-in-out transform hover:scale-[1.01] active:scale-[0.99]"
+                                    // Đã thay đổi màu nút từ bg-red-600 thành bg-amber-600 và hover:bg-amber-700
+                                    className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl shadow-lg text-lg font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition duration-200 ease-in-out transform hover:scale-[1.01] active:scale-[0.99]"
                                 >
                                     Xác Nhận Đặt Bàn
                                 </button>

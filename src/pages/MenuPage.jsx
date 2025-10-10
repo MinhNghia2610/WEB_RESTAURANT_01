@@ -1,91 +1,153 @@
 import React from 'react';
-import { ShoppingCartIcon } from '@heroicons/react/24/solid';
+import { Wine, Coffee, ChefHat, Salad } from 'lucide-react';
 
-// Dữ liệu mẫu (sử dụng lại và mở rộng)
-const menuData = [
-    { 
-        category: 'Món Chính (Phở & Bún)', 
+// Dữ liệu Menu Đầy Đủ (Đã phân loại)
+const fullMenuData = [
+    {
+        title: "KHAI VỊ (ENTRÉES)",
+        icon: Salad,
         items: [
-            { id: 'M01', name: 'Phở Bò Đặc Biệt', price: 95000, desc: 'Thịt bò tái, nạm, gầu, gân. Nước dùng ninh 8 tiếng.', image: 'https://placehold.co/400x200/F8D7DA/DC3545?text=PHO' },
-            { id: 'M02', name: 'Bún Chả Hà Nội', price: 85000, desc: 'Thịt nướng than hoa, chả băm, ăn kèm nước chấm chua ngọt.', image: 'https://placehold.co/400x200/D4EDDA/28A745?text=BUN+CHA' },
-            { id: 'M03', name: 'Mì Quảng Hải Sản', price: 110000, desc: 'Tôm, mực tươi, trứng cút. Sợi mì vàng ươm, đậm đà.', image: 'https://placehold.co/400x200/FFF3CD/FFC107?text=MI+QUANG' },
+            {
+                name: "Foie Gras Terrine Dưỡng Sinh",
+                description: "Gan ngỗng áp chảo kỹ thuật Pháp, dùng kèm mứt gừng tươi và rượu Sauternes, giúp bổ khí huyết.",
+                price: "450.000 VNĐ"
+            },
+            {
+                name: "Tôm Hùm Canape Đông Trùng",
+                description: "Thịt tôm hùm tươi Canada trộn với bơ tỏi và đông trùng hạ thảo, đặt trên bánh mì nướng giòn.",
+                price: "380.000 VNĐ"
+            },
+            {
+                name: "Súp Bí Đỏ Hạt Sen",
+                description: "Súp kem bí đỏ nấu chậm, rắc hạt sen rang giòn, vị ngọt thanh mát, hỗ trợ tiêu hóa.",
+                price: "180.000 VNĐ"
+            },
         ]
     },
-    { 
-        category: 'Món Nhẹ & Ăn Kèm', 
+    {
+        title: "MÓN CHÍNH (PLATS PRINCIPAUX)",
+        icon: ChefHat,
         items: [
-            { id: 'A01', name: 'Nem Rán Giòn', price: 60000, desc: 'Nem tôm thịt, cuốn bánh đa, chiên giòn rụm.', image: 'https://placehold.co/400x200/CCE5FF/007BFF?text=NEM' },
-            { id: 'A02', name: 'Gỏi Cuốn Tôm Thịt', price: 75000, desc: 'Thanh mát, ăn kèm nước tương đậu phộng.', image: 'https://placehold.co/400x200/E2E3E5/6C757D?text=GOI+CUON' },
+            {
+                name: "L'Essence de Boeuf Wagyu A5",
+                description: "Thăn nội bò Wagyu A5 áp chảo, sốt Reduction rượu vang đỏ, nấm truffle đen và rau củ Dưỡng Sinh.",
+                price: "1.250.000 VNĐ"
+            },
+            {
+                name: "Cá Tuyết Hấp Thảo Dược",
+                description: "Cá tuyết Chile hấp cách thủy cùng Đẳng Sâm, Kỷ Tử, cân bằng âm dương, ăn kèm khoai tây nghiền.",
+                price: "890.000 VNĐ"
+            },
+            {
+                name: "Thịt Cừu Úc Sốt Mận Tím",
+                description: "Thịt cừu Úc nướng hồng, sốt mận tím và rượu Port, ăn kèm măng tây xanh nướng.",
+                price: "950.000 VNĐ"
+            },
         ]
     },
-    { 
-        category: 'Thức Uống', 
+    {
+        title: "TRÁNG MIỆNG & ĐỒ UỐNG NÓNG",
+        icon: Coffee,
         items: [
-            { id: 'D01', name: 'Cà Phê Sữa Đá', price: 40000, desc: 'Cà phê nguyên chất, vị đậm đà.', image: 'https://placehold.co/400x200/D1ECF1/17A2B8?text=COFFEE' },
-            { id: 'D02', name: 'Trà Sen Vàng', price: 35000, desc: 'Trà sen ướp lạnh, vị thanh tao.', image: 'https://placehold.co/400x200/F8F8F8/000000?text=TEA' },
+            {
+                name: "Tiramisu Sen Vàng",
+                description: "Bánh Tiramisu phiên bản Việt: lớp kem Mascarpone cùng bột trà xanh và hạt sen tươi.",
+                price: "150.000 VNĐ"
+            },
+            {
+                name: "Kem Sữa Chua Dâu Rừng",
+                description: "Kem sữa chua tự nhiên, topping dâu rừng và mật ong hoa cà phê, thanh mát.",
+                price: "120.000 VNĐ"
+            },
+            {
+                name: "Trà Thảo Mộc L'Essence",
+                description: "Tuyển chọn các loại hoa và thảo mộc giúp thư giãn và thải độc.",
+                price: "90.000 VNĐ"
+            },
         ]
-    }
+    },
+    {
+        title: "TUYỂN CHỌN RƯỢU VANG",
+        icon: Wine,
+        items: [
+            {
+                name: "Château Margaux Premier Cru (Bordeaux, 2010)",
+                description: "Dòng rượu cao cấp, hương vị cổ điển, đậm đà và phức hợp, có sẵn chai (750ml).",
+                price: "Liên hệ Sommelier"
+            },
+            {
+                name: "Cloudy Bay Sauvignon Blanc (Marlborough, 2023)",
+                description: "Rượu vang trắng nhẹ, hương bưởi và chanh dây, lý tưởng cho hải sản.",
+                price: "350.000 VNĐ/ly"
+            },
+        ]
+    },
 ];
 
-const formatCurrency = (amount) => amount.toLocaleString('vi-VN');
+// Component hiển thị chi tiết một món ăn
+const MenuItem = ({ item }) => (
+    <div className="flex justify-between items-start border-b border-gray-700 pb-4 mb-4">
+        <div className="flex-grow pr-4">
+            <h3 className="text-xl font-bold font-serif text-amber-500 mb-1">
+                {item.name}
+            </h3>
+            <p className="text-sm text-gray-400">
+                {item.description}
+            </p>
+        </div>
+        <div className="flex-shrink-0 text-right">
+            <p className="text-xl font-extrabold text-white">
+                {item.price}
+            </p>
+        </div>
+    </div>
+);
 
 const MenuPage = () => {
-    // Tạm thời chưa xử lý logic Cart ở đây, chỉ hiển thị UI
-    const handleAddToCart = (item) => {
-        console.log(`Đã thêm ${item.name} vào giỏ hàng`);
-        // Logic thực tế sẽ gọi addItemToCart() từ useCart()
-    };
-
     return (
-        <div className="pt-24 pb-16 bg-white min-h-screen">
-            <div className="container mx-auto px-4 md:px-8">
-                <h1 className="text-6xl font-extrabold text-center text-gray-900 mb-2">
-                    Thực Đơn Đầy Đủ
-                </h1>
-                <p className="text-center text-gray-500 mb-12">
-                    Khám phá sự đa dạng của ẩm thực Việt Nam qua bàn tay L2 Food.
-                </p>
+        <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                {/* Tiêu đề trang Menu */}
+                <header className="text-center mb-16">
+                    <p className="text-amber-500 font-serif uppercase tracking-widest mb-2">
+                        TOÀN BỘ THỰC ĐƠN
+                    </p>
+                    <h1 className="text-5xl md:text-7xl font-extrabold leading-tight font-serif text-white">
+                        Bộ Sưu Tập L'ESSENCE
+                    </h1>
+                    <p className="text-gray-400 mt-4 text-lg max-w-xl mx-auto">
+                        Khám phá hành trình ẩm thực Dưỡng Sinh, nơi kỹ thuật Fine Dining Pháp gặp gỡ triết lý cân bằng Á Đông.
+                    </p>
+                </header>
 
-                {menuData.map((category, catIndex) => (
-                    <div key={catIndex} className="mb-12">
-                        <h2 className="text-4xl font-bold text-red-600 border-b-2 border-red-200 pb-2 mb-8 mt-6">
-                            {category.category}
-                        </h2>
-                        
-                        {/* Hiển thị món ăn dạng danh sách */}
-                        <div className="space-y-6">
-                            {category.items.map((item) => (
-                                <div key={item.id} className="flex flex-col md:flex-row items-center bg-gray-50 p-4 rounded-xl shadow-lg hover:shadow-red-100 transition duration-300">
-                                    
-                                    {/* Ảnh món ăn */}
-                                    <img 
-                                        src={item.image} 
-                                        alt={item.name} 
-                                        className="w-full md:w-40 h-32 object-cover rounded-lg flex-shrink-0 mb-4 md:mb-0 md:mr-6"
-                                    />
-                                    
-                                    {/* Chi tiết món ăn */}
-                                    <div className="flex-grow">
-                                        <h3 className="text-2xl font-bold text-gray-900">{item.name}</h3>
-                                        <p className="text-gray-600 mt-1 mb-2">{item.desc}</p>
-                                        <p className="text-xl font-extrabold text-red-700">
-                                            {formatCurrency(item.price)} <span className="text-sm font-semibold">VNĐ</span>
-                                        </p>
-                                    </div>
+                {/* Các phần Menu theo danh mục */}
+                <div className="space-y-16">
+                    {fullMenuData.map((category, index) => (
+                        <div key={index} className="bg-gray-800 p-8 rounded-xl shadow-2xl">
+                            
+                            {/* Tiêu đề danh mục */}
+                            <div className="flex items-center justify-center mb-10 border-b-2 border-amber-600/50 pb-4">
+                                <category.icon className="w-8 h-8 text-amber-500 mr-4" />
+                                <h2 className="text-3xl font-bold font-serif text-amber-500 uppercase tracking-wider">
+                                    {category.title}
+                                </h2>
+                            </div>
 
-                                    {/* Nút Thêm vào Giỏ */}
-                                    <button
-                                        onClick={() => handleAddToCart(item)}
-                                        className="mt-4 md:mt-0 px-6 py-2 bg-red-600 text-white font-semibold rounded-full shadow-md hover:bg-red-700 transition duration-300 flex items-center"
-                                    >
-                                        <ShoppingCartIcon className="w-5 h-5 mr-2" />
-                                        Thêm
-                                    </button>
-                                </div>
-                            ))}
+                            {/* Danh sách món ăn */}
+                            <div className="space-y-6">
+                                {category.items.map((item, itemIndex) => (
+                                    <MenuItem key={itemIndex} item={item} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
+
+                {/* Ghi chú chân trang */}
+                <footer className="text-center mt-20 text-gray-500 italic text-sm">
+                    <p>* Giá trên chưa bao gồm 10% VAT và 5% phí phục vụ. Vui lòng hỏi Sommelier để được tư vấn rượu vang.</p>
+                </footer>
             </div>
         </div>
     );
