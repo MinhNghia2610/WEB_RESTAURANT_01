@@ -28,15 +28,6 @@ const HeroSection = () => {
           <h1 className="text-7xl md:text-8xl font-bold mt-3 mb-10 tracking-widest uppercase">
             L'ESSENCE
           </h1>
-
-          {/* Nút ĐẶT HÀNG NGAY - CTA */}
-          <button
-            onClick={() => { /* logic chuyển đến trang đặt hàng */ }}
-            className="mt-6 px-10 py-3 bg-red-600 hover:bg-red-700 text-white text-lg font-bold rounded-full shadow-lg transform transition duration-300 hover:scale-105"
-          >
-             ĐẶT BÀN ONLINE
-          </button>
-
           
           {/* Tiêu đề Phụ 2: Slogan (Tiếng Việt) */}
           <p className="text-2xl font-light italic font-serif text-gray-100 mb-12">

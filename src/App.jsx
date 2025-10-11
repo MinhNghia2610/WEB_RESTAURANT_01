@@ -1,119 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext.jsx'; 
 
-// Import các Components và Pages
-import Navbar from './components/Navbar'; 
-import HeroSection from './components/HeroSection'; 
-<<<<<<< HEAD
-import CartSidebar from './components/CartSidebar';
-import StorySection from './components/StorySection'; 
-import Testimonials from './components/Testimonials'; 
-import Footer from './components/Footer';
-import ChatBot from './components/ChatBot'; // IMPORT MỚI: POP UP CHAT BOT
-import AuthModal from './components/AuthModal';
+// *************** IMPORTS LAYOUTS ***************
+import UserLayout from './components/UserComponents/UserLayout.jsx'; // Đảm bảo UserComponents là PascalCase
+// AdminLayout được import bên trong ProtectedRoute
+import ProtectedRoute from './components/AdminComponents/ProtectedRoute.jsx'; // Đảm bảo AdminComponents là PascalCase
 
-// Imports các trang nội dung (điều chỉnh tên file theo cấu trúc mới)
-=======
-// ... (Các imports khác: CartSidebar, Footer, Pages...)
->>>>>>> ad551855fe4e7c875e4ec807b564c535c80d8db2
-import GioiThieuPage from './pages/AboutUs'; 
-import MenuPage from './pages/MenuPage';
-import ReservationPage from './pages/ReservationPage'; 
-import StorySection from './components/StorySection'; 
-import MenuTeaser from './components/MenuTeaser'; 
-import ImageSlider from './components/ImageSlider';
-import Testimonials from './components/Testimonials';
-import CartSidebar from './components/CartSidebar';
-import AuthModal from './components/AuthModal';
-import Footer from './components/Footer';
+// *************** IMPORTS AUTH PAGES ***************
+import AuthModal from './components/usercomponents/AuthModal.jsx';
 
-<<<<<<< HEAD
-// Hàm đơn giản để xác định trang hiện tại dựa trên hash URL (ví dụ: #gioi-thieu)
-const getPage = () => {
-    const hash = window.location.hash.slice(1).toLowerCase();
-    switch (hash) {
-        case 'gioi-thieu':
-            return 'gioi-thieu';
-        case 'thuc-don':
-            return 'thuc-don';
-        case 'bai-viet':
-            return 'bai-viet';
-        case 'dat-ban':
-            return 'dat-ban';
-        default:
-            return 'trang-chu';
-    }   
-=======
-// Component để buộc cuộn lên đầu trang (Rất quan trọng!)
-const ScrollToTop = () => {
-    const { pathname } = useLocation();
-    
-    // Lắng nghe mỗi khi pathname (đường dẫn URL) thay đổi
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [pathname]);
+// *************** IMPORTS USER PAGES ***************
+import HomePageContent from './pages/User/HomePageContent.jsx'; // Đảm bảo User là PascalCase
+import GioiThieuPage from './pages/User/AboutUs.jsx'; // Đảm bảo User là PascalCase
+import MenuPage from './pages/User/MenuPage.jsx'; // Đảm bảo User là PascalCase
+import ReservationPage from './pages/User/ReservationPage.jsx'; // Đảm bảo User là PascalCase
 
-    return null; // Component này không render gì cả
->>>>>>> ad551855fe4e7c875e4ec807b564c535c80d8db2
-};
+// *************** IMPORTS ADMIN PAGES ***************
+// LƯU Ý: Đảm bảo đường dẫn import không bị sai chữ hoa/thường (pages/Admin)
+import DashboardPage from './pages/admin/DashboardPage.jsx'; 
+import MenuManagement from './pages/admin/MenuManagement.jsx'; 
+import ReservationManagement from './pages/Admin/ReservationManagement.jsx'; 
 
-const HomePageContent = () => (
-    <>
-        <HeroSection /> 
-        <StorySection />
-        <MenuTeaser /> 
-        <ImageSlider />
-        <Testimonials />
-    </>
-);
-
-function AppContent() {
-    const [isCartOpen, setIsCartOpen] = useState(false); 
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); 
-    
-    // Lấy vị trí hiện tại để có thể truyền vào Navbar nếu cần (ví dụ: đánh dấu menu đang hoạt động)
-    const location = useLocation(); 
-
-    return (
-        <div className="App font-sans">
-            <ScrollToTop /> {/* Thêm component cuộn lên đầu */}
-            
-            <Navbar 
-                setIsCartOpen={setIsCartOpen} 
-                setIsAuthModalOpen={setIsAuthModalOpen} 
-                currentPage={location.pathname} // Truyền đường dẫn hiện tại
-            />
-
-            <main className="min-h-screen">
-                <Routes>
-                    {/* TRANG CHỦ: Đường dẫn '/' */}
-                    <Route path="/" element={<HomePageContent />} /> 
-                    
-                    {/* CÁC TRANG NỘI DUNG KHÁC */}
-                    <Route path="/gioi-thieu" element={<GioiThieuPage />} />
-                    <Route path="/thuc-don" element={<MenuPage />} />
-                    <Route path="/dat-ban" element={<ReservationPage />} /> 
-                    
-                    {/* 404/Không tìm thấy (Nên có) */}
-                    <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
-                </Routes>
-            </main>
-            
-            <CartSidebar isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
-            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-            <Footer /> 
-<<<<<<< HEAD
-            <ChatBot />
-=======
->>>>>>> ad551855fe4e7c875e4ec807b564c535c80d8db2
-        </div>
-    );
-}
 
 function App() {
     return (
         <BrowserRouter>
-            <AppContent />
+            {/* BỌC TẤT CẢ ROUTES BẰNG AuthProvider */}
+            <AuthProvider>
+            <Routes>
+                
+                {/* III. ROUTES XÁC THỰC (AUTH) */}
+                <Route path="/auth" element={<AuthModal isOpen={true} onClose={() => {}} />} />
+
+                {/* I. ROUTES CÔNG KHAI (USER) */}
+                <Route path="/" element={<UserLayout />}>
+                    <Route index element={<HomePageContent />} /> 
+                    <Route path="gioi-thieu" element={<GioiThieuPage />} />
+                    <Route path="thuc-don" element={<MenuPage />} />
+                    <Route path="dat-ban" element={<ReservationPage />} /> 
+                    {/* 404 cho User Layout */}
+                    <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
+                </Route>
+
+                {/* II. ROUTES QUẢN TRỊ (ADMIN) - BẢO VỆ BẰNG ProtectedRoute */}
+                {/* ProtectedRoute đã có AdminLayout bên trong và xử lý bảo mật */}
+                <Route path="/admin" element={<ProtectedRoute />}> 
+                    {/* Đường dẫn index sẽ là /admin */}
+                    <Route index element={<DashboardPage />} />
+                    
+                    {/* ĐÃ SỬA: path="reservations" (có 's') */}
+                    <Route path="reservations" element={<ReservationManagement />} /> 
+
+                    <Route path="dashboard" element={<DashboardPage />} />
+                    <Route path="menu" element={<MenuManagement />} />
+                    
+                    {/* Thêm các route khác nếu cần (Quản lý Đơn hàng, Báo cáo...) */}
+                    <Route path="orders" element={<h1>Quản lý Đơn hàng Placeholder</h1>} />
+                    <Route path="reports" element={<h1>Báo cáo & Thống kê Placeholder</h1>} />
+
+                    {/* Route catch-all cho /admin/* */}
+                    <Route path="*" element={<h1>404 - Trang Admin không tìm thấy</h1>} />
+                </Route>
+                
+            </Routes>
+            </AuthProvider>
         </BrowserRouter>
     );
 }
