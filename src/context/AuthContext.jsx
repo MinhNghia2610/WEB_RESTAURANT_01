@@ -1,54 +1,52 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// 1. Khởi tạo Context
 const AuthContext = createContext(null);
 
 /**
  * Hook tùy chỉnh để sử dụng trạng thái và hàm xác thực.
- * @returns {object} { isAuthenticated, userRole, login, logout }
+ * @returns {object} { isAuthenticated, userRole, token, login, logout }
  */
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
         throw new Error('useAuth must be used within an AuthProvider');
     }
-    // Trả về các giá trị trực tiếp từ context
     return {
         isAuthenticated: context.isAuthenticated,
         userRole: context.userRole,
+        token: context.token, // <-- Đã thêm
         login: context.login,
         logout: context.logout,
     };
 };
 
-// State ban đầu (kiểm tra localStorage cho trạng thái giả lập)
+// State ban đầu (kiểm tra localStorage cho trạng thái)
 const getInitialAuthState = () => {
-    // Lấy role được lưu trữ (user hoặc admin)
+    const storedToken = localStorage.getItem('token'); // Lấy Token
     const storedRole = localStorage.getItem('role');
 
     return {
-        isAuthenticated: !!storedRole, // True nếu có role được lưu
+        isAuthenticated: !!storedToken, 
+        token: storedToken || null,     // Lưu Token
         userRole: storedRole || null
     };
 };
 
-// 2. Component Provider
+// Component Provider
 export const AuthProvider = ({ children }) => {
     const [authState, setAuthState] = useState(getInitialAuthState);
     const navigate = useNavigate();
     
-    // Tách state để dễ dàng truy cập từ useAuth
-    const { isAuthenticated, userRole } = authState;
+    const { isAuthenticated, userRole, token } = authState; // <-- Đã thêm token
 
-    // 3. Hàm xử lý Đăng nhập
-    const login = (role) => {
-        setAuthState({ isAuthenticated: true, userRole: role });
+    // 3. Hàm xử lý Đăng nhập (nhận cả token và role)
+    const login = (token, role) => {
+        setAuthState({ isAuthenticated: true, userRole: role, token: token });
         
-        // Cập nhật localStorage để duy trì trạng thái giả lập sau khi tải lại trang
+        localStorage.setItem('token', token); // Lưu token
         localStorage.setItem('role', role);
         
-        // Logic chuyển hướng sau khi đăng nhập thành công
         if (role === 'admin') {
             navigate('/admin');
         } else {
@@ -58,19 +56,19 @@ export const AuthProvider = ({ children }) => {
 
     // 4. Hàm xử lý Đăng xuất
     const logout = () => {
-        setAuthState({ isAuthenticated: false, userRole: null });
+        setAuthState({ isAuthenticated: false, userRole: null, token: null });
         
-        // Xóa thông tin khỏi localStorage
+        localStorage.removeItem('token'); // Xóa token
         localStorage.removeItem('role');
 
-        // CHỈNH SỬA TẠI ĐÂY: Chuyển hướng về trang chủ chính (/)
         navigate('/'); 
     };
 
     // Giá trị cung cấp cho các component con
     const value = {
-        isAuthenticated, // Đã được tách ra
-        userRole,        // Đã được tách ra
+        isAuthenticated, 
+        userRole,        
+        token,            // Cung cấp token
         login,
         logout,
     };

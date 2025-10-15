@@ -20,7 +20,7 @@ const testimonialsData = [
     },
     {
         quote: "Không gian sang trọng, dịch vụ xuất sắc và đặc biệt là sự chú trọng đến nguyên liệu. L'ESSENCE không chỉ là Fine Dining, đó là trải nghiệm chăm sóc sức khỏe cao cấp.",
-        name: "Dr. Thu Hiền",
+        name: "Dr. Thu Hương",
         title: "Bác sĩ Thẩm mỹ Cao cấp",
         rating: 4,
         image: "https://placehold.co/100x100/F5D050/3A3A3A?text=TH"
