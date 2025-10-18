@@ -1,114 +1,101 @@
-import React from 'react';
-import { Wine, Coffee, ChefHat, Salad } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Wine, Coffee, ChefHat, Salad } from 'lucide-react'; 
 
-// Dữ liệu Menu Đầy Đủ (Đã phân loại)
-const fullMenuData = [
-    {
-        title: "KHAI VỊ (ENTRÉES)",
-        icon: Salad,
-        items: [
-            {
-                name: "Foie Gras Terrine Dưỡng Sinh",
-                description: "Gan ngỗng áp chảo kỹ thuật Pháp, dùng kèm mứt gừng tươi và rượu Sauternes, giúp bổ khí huyết.",
-                price: "450.000 VNĐ"
-            },
-            {
-                name: "Tôm Hùm Canape Đông Trùng",
-                description: "Thịt tôm hùm tươi Canada trộn với bơ tỏi và đông trùng hạ thảo, đặt trên bánh mì nướng giòn.",
-                price: "380.000 VNĐ"
-            },
-            {
-                name: "Súp Bí Đỏ Hạt Sen",
-                description: "Súp kem bí đỏ nấu chậm, rắc hạt sen rang giòn, vị ngọt thanh mát, hỗ trợ tiêu hóa.",
-                price: "180.000 VNĐ"
-            },
-        ]
-    },
-    {
-        title: "MÓN CHÍNH (PLATS PRINCIPAUX)",
-        icon: ChefHat,
-        items: [
-            {
-                name: "L'Essence de Boeuf Wagyu A5",
-                description: "Thăn nội bò Wagyu A5 áp chảo, sốt Reduction rượu vang đỏ, nấm truffle đen và rau củ Dưỡng Sinh.",
-                price: "1.250.000 VNĐ"
-            },
-            {
-                name: "Cá Tuyết Hấp Thảo Dược",
-                description: "Cá tuyết Chile hấp cách thủy cùng Đẳng Sâm, Kỷ Tử, cân bằng âm dương, ăn kèm khoai tây nghiền.",
-                price: "890.000 VNĐ"
-            },
-            {
-                name: "Thịt Cừu Úc Sốt Mận Tím",
-                description: "Thịt cừu Úc nướng hồng, sốt mận tím và rượu Port, ăn kèm măng tây xanh nướng.",
-                price: "950.000 VNĐ"
-            },
-        ]
-    },
-    {
-        title: "TRÁNG MIỆNG & ĐỒ UỐNG NÓNG",
-        icon: Coffee,
-        items: [
-            {
-                name: "Tiramisu Sen Vàng",
-                description: "Bánh Tiramisu phiên bản Việt: lớp kem Mascarpone cùng bột trà xanh và hạt sen tươi.",
-                price: "150.000 VNĐ"
-            },
-            {
-                name: "Kem Sữa Chua Dâu Rừng",
-                description: "Kem sữa chua tự nhiên, topping dâu rừng và mật ong hoa cà phê, thanh mát.",
-                price: "120.000 VNĐ"
-            },
-            {
-                name: "Trà Thảo Mộc L'Essence",
-                description: "Tuyển chọn các loại hoa và thảo mộc giúp thư giãn và thải độc.",
-                price: "90.000 VNĐ"
-            },
-        ]
-    },
-    {
-        title: "TUYỂN CHỌN RƯỢU VANG",
-        icon: Wine,
-        items: [
-            {
-                name: "Château Margaux Premier Cru (Bordeaux, 2010)",
-                description: "Dòng rượu cao cấp, hương vị cổ điển, đậm đà và phức hợp, có sẵn chai (750ml).",
-                price: "Liên hệ Sommelier"
-            },
-            {
-                name: "Cloudy Bay Sauvignon Blanc (Marlborough, 2023)",
-                description: "Rượu vang trắng nhẹ, hương bưởi và chanh dây, lý tưởng cho hải sản.",
-                price: "350.000 VNĐ/ly"
-            },
-        ]
-    },
-];
+// Hàm hỗ trợ để ánh xạ tên danh mục sang Icon
+const getCategoryIcon = (categoryTitle) => {
+    // Chúng ta sẽ lấy tên danh mục từ trường 'category' của DB, 
+    // vốn được gom nhóm thành 'categoryName'
+    const title = categoryTitle ? categoryTitle.toUpperCase() : '';
+    if (title.includes('KHAI VỊ') || title.includes('ENTRÉES')) return Salad;
+    if (title.includes('CHÍNH') || title.includes('PLATS PRINCIPAUX')) return ChefHat;
+    if (title.includes('TRÁNG MIỆNG') || title.includes('DESSERTS')) return Coffee;
+    if (title.includes('RƯỢU VANG') || title.includes('WINE')) return Wine;
+    return ChefHat;
+};
 
 // Component hiển thị chi tiết một món ăn
 const MenuItem = ({ item }) => (
-    <div className="flex justify-between items-start border-b border-gray-700 pb-4 mb-4">
-        <div className="flex-grow pr-4">
-            <h3 className="text-xl font-bold font-serif text-amber-500 mb-1">
-                {item.name}
-            </h3>
-            <p className="text-sm text-gray-400">
-                {item.description}
-            </p>
-        </div>
-        <div className="flex-shrink-0 text-right">
-            <p className="text-xl font-extrabold text-white">
-                {item.price}
-            </p>
+    // Chúng ta thêm lớp flex và xử lý hình ảnh
+    <div className="flex items-center border-b border-gray-700 pb-4 mb-4">
+        
+        {/* Lấy hình ảnh từ item.imageURL */}
+        {item.imageURL && (
+            <img 
+                src={item.imageURL} 
+                alt={item.name} 
+                className="w-24 h-24 object-cover rounded-lg mr-6 flex-shrink-0"
+            />
+        )}
+        
+        <div className="flex-grow flex justify-between items-start">
+            <div className="flex-grow pr-4">
+                <h3 className="text-xl font-bold font-serif text-amber-500 mb-1">
+                    {/* Dùng item.name */}
+                    {item.name}
+                </h3>
+                <p className="text-sm text-gray-400">
+                    {/* Dùng item.description */}
+                    {item.description}
+                </p>
+            </div>
+            <div className="flex-shrink-0 text-right">
+                <p className="text-xl font-extrabold text-white">
+                    {/* Dùng item.price (là số) và item.unit */}
+                    {item.price 
+                        ? `${item.price.toLocaleString('vi-VN')} ${item.unit || 'VNĐ'}` 
+                        : item.unit || "Liên hệ"}
+                </p>
+            </div>
         </div>
     </div>
 );
 
 const MenuPage = () => {
+    // Dùng state để lưu dữ liệu menu dynamic từ API
+    const [menuData, setMenuData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchMenu = async () => {
+            try {
+                // Gọi API backend (đã được cấu hình trong server.js)
+                const response = await fetch('http://localhost:5000/api/menu'); 
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch menu data');
+                }
+                
+                const result = await response.json();
+                // Dữ liệu đã được Controller gom nhóm thành categoryName/items
+                setMenuData(result.data || []);
+                
+            } catch (err) {
+                console.error("Lỗi khi fetch menu:", err);
+                setError('Không thể tải thực đơn. Vui lòng kiểm tra Server và MongoDB.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchMenu();
+    }, []);
+
+    // Hiển thị trạng thái Loading và Error
+    if (isLoading) {
+        return <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white text-center text-2xl">Đang tải thực đơn...</div>;
+    }
+
+    if (error) {
+        return <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-red-500 text-center text-2xl">{error}</div>;
+    }
+
+
     return (
         <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Tiêu đề trang Menu */}
+                {/* Tiêu đề trang Menu (Giữ nguyên) */}
                 <header className="text-center mb-16">
                     <p className="text-amber-500 font-serif uppercase tracking-widest mb-2">
                         TOÀN BỘ THỰC ĐƠN
@@ -123,28 +110,38 @@ const MenuPage = () => {
 
                 {/* Các phần Menu theo danh mục */}
                 <div className="space-y-16">
-                    {fullMenuData.map((category, index) => (
-                        <div key={index} className="bg-gray-800 p-8 rounded-xl shadow-2xl">
-                            
-                            {/* Tiêu đề danh mục */}
-                            <div className="flex items-center justify-center mb-10 border-b-2 border-amber-600/50 pb-4">
-                                <category.icon className="w-8 h-8 text-amber-500 mr-4" />
-                                <h2 className="text-3xl font-bold font-serif text-amber-500 uppercase tracking-wider">
-                                    {category.title}
-                                </h2>
-                            </div>
+                    {/* Dùng menuData từ API */}
+                    {menuData.map((category) => {
+                        // Lấy Icon dựa trên tên danh mục (categoryName)
+                        const IconComponent = getCategoryIcon(category.categoryName);
+                        
+                        return (
+                            // Dùng categoryName làm key vì categoryName là tên danh mục
+                            <div key={category.categoryName} className="bg-gray-800 p-8 rounded-xl shadow-2xl">
+                                
+                                {/* Tiêu đề danh mục */}
+                                <div className="flex items-center justify-center mb-10 border-b-2 border-amber-600/50 pb-4">
+                                    <IconComponent className="w-8 h-8 text-amber-500 mr-4" />
+                                    <h2 className="text-3xl font-bold font-serif text-amber-500 uppercase tracking-wider">
+                                        {/* Dùng category.categoryName */}
+                                        {category.categoryName} 
+                                    </h2>
+                                </div>
 
-                            {/* Danh sách món ăn */}
-                            <div className="space-y-6">
-                                {category.items.map((item, itemIndex) => (
-                                    <MenuItem key={itemIndex} item={item} />
-                                ))}
+                                {/* Danh sách món ăn */}
+                                <div className="space-y-6">
+                                    {/* Dùng category.items */}
+                                    {category.items.map((item, itemIndex) => (
+                                        // item._id là ID thực tế từ DB, dùng nó làm key tốt nhất
+                                        <MenuItem key={item._id || itemIndex} item={item} />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
-                {/* Ghi chú chân trang */}
+                {/* Ghi chú chân trang (Giữ nguyên) */}
                 <footer className="text-center mt-20 text-gray-500 italic text-sm">
                     <p>* Giá trên chưa bao gồm 10% VAT và 5% phí phục vụ. Vui lòng hỏi Sommelier để được tư vấn rượu vang.</p>
                 </footer>
