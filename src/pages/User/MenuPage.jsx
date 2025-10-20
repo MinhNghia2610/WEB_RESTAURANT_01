@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/User/MenuPage.jsx
+
+import React, { useState, useEffect, useRef } from 'react'; 
+// Import các icon từ lucide-react
 import { Wine, Coffee, ChefHat, Salad } from 'lucide-react'; 
 
-// Hàm hỗ trợ để ánh xạ tên danh mục sang Icon
+// Hàm ánh xạ tên danh mục thành icon
 const getCategoryIcon = (categoryTitle) => {
-    // Chúng ta sẽ lấy tên danh mục từ trường 'category' của DB, 
-    // vốn được gom nhóm thành 'categoryName'
     const title = categoryTitle ? categoryTitle.toUpperCase() : '';
     if (title.includes('KHAI VỊ') || title.includes('ENTRÉES')) return Salad;
     if (title.includes('CHÍNH') || title.includes('PLATS PRINCIPAUX')) return ChefHat;
@@ -13,53 +14,87 @@ const getCategoryIcon = (categoryTitle) => {
     return ChefHat;
 };
 
-// Component hiển thị chi tiết một món ăn
-const MenuItem = ({ item }) => (
-    // Chúng ta thêm lớp flex và xử lý hình ảnh
-    <div className="flex items-center border-b border-gray-700 pb-4 mb-4">
+
+// 👇 COMPONENT MỚI: MenuCard - Hiển thị món ăn dạng thẻ (card)
+const MenuCard = ({ item }) => (
+    <div className="bg-gray-800 p-4 rounded-xl shadow-lg flex flex-col hover:shadow-amber-500/30 transition duration-300">
         
         {/* Lấy hình ảnh từ item.imageURL */}
         {item.imageURL && (
             <img 
-                src={item.imageURL} 
+                src={item.imageURL || 'https://via.placeholder.com/300/1f2937/d1d5db?text=Food'} 
                 alt={item.name} 
-                className="w-24 h-24 object-cover rounded-lg mr-6 flex-shrink-0"
+                className="w-full h-40 object-cover rounded-lg mb-3"
             />
         )}
         
-        <div className="flex-grow flex justify-between items-start">
-            <div className="flex-grow pr-4">
-                <h3 className="text-xl font-bold font-serif text-amber-500 mb-1">
-                    {/* Dùng item.name */}
-                    {item.name}
-                </h3>
-                <p className="text-sm text-gray-400">
-                    {/* Dùng item.description */}
-                    {item.description}
-                </p>
-            </div>
-            <div className="flex-shrink-0 text-right">
-                <p className="text-xl font-extrabold text-white">
-                    {/* Dùng item.price (là số) và item.unit */}
-                    {item.price 
-                        ? `${item.price.toLocaleString('vi-VN')} ${item.unit || 'VNĐ'}` 
-                        : item.unit || "Liên hệ"}
-                </p>
-            </div>
+        <h3 className="text-xl font-bold font-serif text-amber-500 mb-1">{item.name}</h3>
+        <p className="text-sm text-gray-400 flex-grow mb-3">{item.description}</p>
+        
+        <div className="mt-auto pt-3 border-t border-gray-700">
+            <p className="text-2xl font-extrabold text-white text-right">
+                {/* Hiển thị giá và đơn vị */}
+                {item.price 
+                    ? `${item.price.toLocaleString('vi-VN')} ${item.unit || 'VNĐ'}` 
+                    : item.unit || "Liên hệ"}
+            </p>
         </div>
     </div>
 );
+// 👆 KẾT THÚC COMPONENT MenuCard 👆
+
 
 const MenuPage = () => {
-    // Dùng state để lưu dữ liệu menu dynamic từ API
     const [menuData, setMenuData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    // KHAI BÁO useRef để lưu trữ các tham chiếu đến các danh mục
+    const categoryRefs = useRef({}); 
+    // KHAI BÁO state để theo dõi danh mục hiện tại (dùng cho việc highlight)
+    const [activeCategory, setActiveCategory] = useState(null); 
 
+    // Hàm cuộn đến danh mục (Không đổi)
+    const scrollToCategory = (categoryName) => {
+        const ref = categoryRefs.current[categoryName];
+        if (ref) {
+            const yOffset = -120;
+            const y = ref.getBoundingClientRect().top + window.scrollY + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+            setActiveCategory(categoryName);
+        }
+    };
+    
+    // Hàm theo dõi Intersection Observer (Không đổi)
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setActiveCategory(entry.target.dataset.category);
+                    }
+                });
+            },
+            {
+                rootMargin: '-120px 0px -70% 0px', 
+                threshold: 0 
+            }
+        );
+
+        Object.values(categoryRefs.current).forEach(ref => {
+            if (ref) {
+                observer.observe(ref);
+            }
+        });
+
+        return () => observer.disconnect();
+    }, [menuData]); 
+
+    // Fetch Data (Không đổi)
     useEffect(() => {
         const fetchMenu = async () => {
             try {
-                // Gọi API backend (đã được cấu hình trong server.js)
+                // Đảm bảo server backend đang chạy ở cổng 5000
                 const response = await fetch('http://localhost:5000/api/menu'); 
                 
                 if (!response.ok) {
@@ -67,7 +102,6 @@ const MenuPage = () => {
                 }
                 
                 const result = await response.json();
-                // Dữ liệu đã được Controller gom nhóm thành categoryName/items
                 setMenuData(result.data || []);
                 
             } catch (err) {
@@ -80,8 +114,8 @@ const MenuPage = () => {
 
         fetchMenu();
     }, []);
+    
 
-    // Hiển thị trạng thái Loading và Error
     if (isLoading) {
         return <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white text-center text-2xl">Đang tải thực đơn...</div>;
     }
@@ -93,9 +127,9 @@ const MenuPage = () => {
 
     return (
         <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Tiêu đề trang Menu (Giữ nguyên) */}
+                {/* Tiêu đề trang Menu (Không đổi) */}
                 <header className="text-center mb-16">
                     <p className="text-amber-500 font-serif uppercase tracking-widest mb-2">
                         TOÀN BỘ THỰC ĐƠN
@@ -108,40 +142,73 @@ const MenuPage = () => {
                     </p>
                 </header>
 
-                {/* Các phần Menu theo danh mục */}
-                <div className="space-y-16">
-                    {/* Dùng menuData từ API */}
-                    {menuData.map((category) => {
-                        // Lấy Icon dựa trên tên danh mục (categoryName)
-                        const IconComponent = getCategoryIcon(category.categoryName);
-                        
-                        return (
-                            // Dùng categoryName làm key vì categoryName là tên danh mục
-                            <div key={category.categoryName} className="bg-gray-800 p-8 rounded-xl shadow-2xl">
-                                
-                                {/* Tiêu đề danh mục */}
-                                <div className="flex items-center justify-center mb-10 border-b-2 border-amber-600/50 pb-4">
-                                    <IconComponent className="w-8 h-8 text-amber-500 mr-4" />
-                                    <h2 className="text-3xl font-bold font-serif text-amber-500 uppercase tracking-wider">
-                                        {/* Dùng category.categoryName */}
-                                        {category.categoryName} 
-                                    </h2>
-                                </div>
+                {/* BỐ CỤC 2 CỘT CHO MENU & DANH MỤC LỌC (Không đổi) */}
+                <div className="flex gap-10">
+                    
+                    {/* CỘT 1: SIDEBAR DANH MỤC (Không đổi) */}
+                    <aside className="hidden lg:block w-64 flex-shrink-0">
+                        <div className="sticky top-28 bg-gray-800 p-6 rounded-xl shadow-lg border border-amber-500/30">
+                            <h3 className="text-2xl font-bold font-serif text-white mb-4 border-b border-gray-600 pb-2">
+                                Danh Mục
+                            </h3>
+                            <ul className="space-y-2">
+                                {menuData.map((category) => (
+                                    <li key={category.categoryName}>
+                                        <button
+                                            onClick={() => scrollToCategory(category.categoryName)}
+                                            className={`
+                                                w-full text-left py-2 px-3 rounded-lg transition duration-200
+                                                ${activeCategory === category.categoryName
+                                                    ? 'bg-amber-600 text-white font-bold' // ACTIVE
+                                                    : 'text-gray-300 hover:bg-gray-700 hover:text-amber-500' // INACTIVE
+                                                }
+                                            `}
+                                        >
+                                            <span className='font-medium text-lg'>{category.categoryName}</span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </aside>
 
-                                {/* Danh sách món ăn */}
-                                <div className="space-y-6">
-                                    {/* Dùng category.items */}
-                                    {category.items.map((item, itemIndex) => (
-                                        // item._id là ID thực tế từ DB, dùng nó làm key tốt nhất
-                                        <MenuItem key={item._id || itemIndex} item={item} />
-                                    ))}
-                                </div>
-                            </div>
-                        );
-                    })}
+                    {/* CỘT 2: NỘI DUNG MENU CHÍNH */}
+                    <main className="flex-grow">
+                        <div className="space-y-16">
+                            {menuData.map((category) => {
+                                const IconComponent = getCategoryIcon(category.categoryName); 
+                                
+                                return (
+                                    <div 
+                                        key={category.categoryName} 
+                                        ref={el => categoryRefs.current[category.categoryName] = el}
+                                        data-category={category.categoryName}
+                                        className="bg-gray-800 p-8 rounded-xl shadow-2xl"
+                                    >
+                                        
+                                        {/* Tiêu đề danh mục (Không đổi) */}
+                                        <div className="flex items-center justify-center mb-10 border-b-2 border-amber-600/50 pb-4">
+                                            <IconComponent className="w-8 h-8 text-amber-500 mr-4" />
+                                            <h2 className="text-3xl font-bold font-serif text-amber-500 uppercase tracking-wider">
+                                                {category.categoryName} 
+                                            </h2>
+                                        </div>
+
+                                        {/* 👇 DANH SÁCH MÓN ĂN DẠNG CARD (Grid Layout) */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                                            {category.items.map((item, itemIndex) => (
+                                                <MenuCard key={item._id || itemIndex} item={item} />
+                                            ))}
+                                        </div>
+                                        {/* 👆 KẾT THÚC DANH SÁCH MÓN ĂN DẠNG CARD */}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </main>
                 </div>
 
-                {/* Ghi chú chân trang (Giữ nguyên) */}
+                {/* Ghi chú chân trang (Không đổi) */}
                 <footer className="text-center mt-20 text-gray-500 italic text-sm">
                     <p>* Giá trên chưa bao gồm 10% VAT và 5% phí phục vụ. Vui lòng hỏi Sommelier để được tư vấn rượu vang.</p>
                 </footer>
