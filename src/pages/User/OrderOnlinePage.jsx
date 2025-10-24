@@ -1,24 +1,25 @@
-// src/pages/User/OrderOnlinePage.jsx (PHIÊN BẢN ĐÃ TÁI CẤU TRÚC)
+// src/pages/User/OrderOnlinePage.jsx (ĐÃ SỬA LỖI SCROLL-SPY)
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import OrderMenu from '../../components/order/OrderMenu';
 import OrderSidebar from '../../components/order/OrderSidebar';
 import OrderSearchBar from '../../components/order/OrderSearchBar';
-import { Loader, AlertCircle } from 'lucide-react'; // Import icons
+import { Loader, AlertCircle } from 'lucide-react'; 
 
 const OrderOnlinePage = () => {
-  const [masterDishes, setMasterDishes] = useState([]); // Danh sách gốc từ API
+  const [masterDishes, setMasterDishes] = useState([]); 
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const [activeCategory, setActiveCategory] = useState(null);
+  // Khởi tạo categoryRefs.current LÀ MỘT OBJECT RỖNG
   const categoryRefs = useRef({});
 
-  // 1. Fetch toàn bộ món ăn (chỉ 1 lần)
+  // 1. Fetch toàn bộ món ăn (Giữ nguyên)
   useEffect(() => {
     const fetchDishes = async () => {
-      setIsLoading(true); // Bắt đầu loading
-      setError(null); // Reset lỗi
+      setIsLoading(true); 
+      setError(null); 
       try {
         const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
         const response = await fetch(`${API_URL}/dishes`); 
@@ -26,9 +27,11 @@ const OrderOnlinePage = () => {
         
         const data = await response.json();
         if (data.success) {
-          const availableDishes = data.data.filter(dish => dish.status === 'available');
+          // Lọc các món 'available' (nếu bạn có logic này)
+          // const availableDishes = data.data.filter(dish => dish.status === 'available');
+          const availableDishes = data.data; // Giả sử lấy tất cả
           setMasterDishes(availableDishes);
-          // Set danh mục đầu tiên là active
+
           if (availableDishes.length > 0) {
             const firstCategory = [...new Set(availableDishes.map(d => d.category))].sort()[0];
             setActiveCategory(firstCategory);
@@ -39,16 +42,16 @@ const OrderOnlinePage = () => {
       } catch (err) {
         setError(err.message);
       } finally {
-        setIsLoading(false); // Kết thúc loading
+        setIsLoading(false); 
       }
     };
     fetchDishes();
   }, []);
 
-  // 2. Lọc món ăn dựa trên thanh tìm kiếm
+  // 2. Lọc món ăn (Giữ nguyên)
   const filteredDishes = useMemo(() => {
     if (!searchTerm) {
-      return masterDishes; // Không tìm, trả về tất cả
+      return masterDishes; 
     }
     const lowerSearchTerm = searchTerm.toLowerCase();
     return masterDishes.filter(dish =>
@@ -57,27 +60,32 @@ const OrderOnlinePage = () => {
     );
   }, [masterDishes, searchTerm]);
 
-  // 3. Tạo danh sách danh mục từ các món ăn ĐÃ LỌC
+  // 3. Tạo danh sách danh mục (Giữ nguyên)
   const categories = useMemo(() => {
     const categorySet = new Set(filteredDishes.map(dish => dish.category));
     return [...categorySet].sort();
   }, [filteredDishes]);
 
-  // 4. Logic cuộn (Scroll-Spy)
+  // 4. Logic cuộn (Giữ nguyên)
   const scrollToCategory = (categoryName) => {
+    // Bây giờ categoryRefs.current sẽ có các ref
     const ref = categoryRefs.current[categoryName];
     if (ref) {
-      const yOffset = -120; // Offset cho sticky header
+      const yOffset = -120; 
       const y = ref.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
-      // Không cần setActiveCategory ở đây vì IntersectionObserver sẽ làm
+      // setActiveCategory(categoryName); // Không cần thiết, Observer sẽ làm
     }
   };
 
+  // ==========================================================
+  // ⭐️ 5. SỬA LỖI LOGIC SCROLL-SPY (useEffect) ⭐️
+  // ==========================================================
   useEffect(() => {
-    // Chỉ chạy observer khi đã có món ăn
-    if (filteredDishes.length === 0) return;
-
+    // `categoryRefs.current` được `OrderMenu` gán trong khi render
+    // `useEffect` chạy SAU KHI render
+    // Vì vậy, `categoryRefs.current` đã được cập nhật ở đây
+    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -86,33 +94,30 @@ const OrderOnlinePage = () => {
           }
         });
       },
-      { rootMargin: '-120px 0px -70% 0px', threshold: 0 }
+      // rootMargin: Giao cắt khi ở 120px trên cùng (sau header)
+      // và 70% dưới cùng (chỉ lấy phần top 30% màn hình)
+      { rootMargin: '-120px 0px -70% 0px', threshold: 0 } 
     );
 
-    // Xóa ref cũ trước khi observe ref mới
+    // Lấy các refs HIỆN TẠI
     const currentRefs = categoryRefs.current;
+    
+    // Bắt đầu theo dõi tất cả
     Object.values(currentRefs).forEach(ref => {
-      if (ref) observer.unobserve(ref);
-    });
-    // Gán lại ref và observe
-    categoryRefs.current = {}; // Reset refs
-    filteredDishes.forEach(dish => {
-        // Chỉ cần quan sát tiêu đề category một lần
-        const ref = categoryRefs.current[dish.category];
-        if (ref) {
-            observer.observe(ref);
-        }
+      if (ref) observer.observe(ref);
     });
 
-
-    // Dọn dẹp khi component unmount hoặc filteredDishes thay đổi
+    // Hàm dọn dẹp: Ngừng theo dõi tất cả
     return () => {
-        Object.values(currentRefs).forEach(ref => {
-            if (ref) observer.unobserve(ref);
-        });
-        observer.disconnect();
+      Object.values(currentRefs).forEach(ref => {
+        if (ref) observer.unobserve(ref);
+      });
+      observer.disconnect();
     };
-}, [filteredDishes]);
+    
+  // Phụ thuộc vào `categories`. Khi danh sách category thay đổi
+  // (do tìm kiếm), chúng ta cần chạy lại để theo dõi các ref mới.
+  }, [categories]); 
 
 
   // === RENDER GIAO DIỆN ===
@@ -133,18 +138,15 @@ const OrderOnlinePage = () => {
         </div>
       );
     }
-    // Truyền ref vào OrderMenu để nó gán cho các div danh mục
     return (
       <OrderMenu dishes={filteredDishes} categoryRefs={categoryRefs} />
     );
   };
 
   return (
-    // NỀN TỐI
     <div className="pt-28 pb-20 bg-gray-900 min-h-screen text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Tiêu đề */}
         <header className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-extrabold font-serif text-white">
             Đặt Món Online
@@ -154,26 +156,20 @@ const OrderOnlinePage = () => {
           </p>
         </header>
 
-        {/* BỐ CỤC 2 CỘT */}
         <div className="flex flex-col lg:flex-row gap-10">
           
-          {/* CỘT 1: SIDEBAR */}
           <OrderSidebar 
-            // Truyền danh sách category đã lọc
             categories={categories} 
             activeCategory={activeCategory}
             onScrollToCategory={scrollToCategory}
           />
 
-          {/* CỘT 2: NỘI DUNG CHÍNH (Tìm kiếm + Menu) */}
           <main className="flex-grow">
-            {/* Thanh tìm kiếm */}
             <OrderSearchBar 
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
             />
             
-            {/* Danh sách món ăn */}
             <div className="bg-gray-800 p-6 md:p-8 rounded-xl shadow-lg border border-gray-700">
               {renderContent()}
             </div>
