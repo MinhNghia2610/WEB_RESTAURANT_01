@@ -1,18 +1,26 @@
-// src/components/order/OrderMenu.jsx (ĐÃ NÂNG CẤP BỘ ĐẾM SỐ LƯỢNG)
+// src/components/order/OrderMenu.jsx (ĐÃ SỬA LỖI TÊN HÀM)
 import React from 'react';
 import { useCart } from '../../context/CartContext'; 
-import { Plus, Minus } from 'lucide-react'; // <-- 1. IMPORT THÊM ICON "MINUS"
+import { Plus, Minus } from 'lucide-react';
 
 // ==========================================================
-// ⭐️ COMPONENT CON ĐÃ ĐƯỢC NÂNG CẤP ⭐️
+// ⭐️ COMPONENT CON ĐÃ SỬA LỖI ⭐️
 // ==========================================================
 const OrderItemCard = ({ dish }) => {
-  // 2. LẤY TOÀN BỘ CONTEXT, BAO GỒM CẢ cartItems VÀ updateQuantity
-  const { cartItems, addToCart, updateQuantity } = useCart(); 
+  // 1. SỬA LẠI TÊN HÀM CHO KHỚP VỚI CONTEXT
+  const { addItem, removeItem, getItemQuantity } = useCart(); 
 
-  // 3. TÌM SỐ LƯỢNG CỦA CHÍNH MÓN NÀY TRONG GIỎ HÀNG
-  const itemInCart = cartItems.find(item => item._id === dish._id);
-  const quantity = itemInCart ? itemInCart.quantity : 0;
+  // 2. SỬA LẠI CÁCH LẤY SỐ LƯỢNG (DÙNG HÀM CÓ SẴN)
+  const quantity = getItemQuantity(dish._id);
+
+  // 3. Sửa hàm xử lý
+  const handleAdd = () => {
+    addItem(dish); // Gọi đúng hàm 'addItem'
+  };
+
+  const handleRemove = () => {
+    removeItem(dish._id); // Gọi đúng hàm 'removeItem'
+  };
 
   return (
     <div className="flex items-start gap-4 p-4 bg-gray-900 border border-gray-700 rounded-lg shadow-sm">
@@ -29,12 +37,12 @@ const OrderItemCard = ({ dish }) => {
         </p>
       </div>
       
-      {/* 4. HIỂN THỊ CỤM NÚT MỚI */}
+      {/* 4. HIỂN THỊ CỤM NÚT MỚI (SỬA HÀM onClick) */}
       <div className="flex-shrink-0 flex items-center justify-center gap-2">
         {quantity === 0 ? (
-          // NẾU SỐ LƯỢNG LÀ 0, HIỂN THỊ NÚT "+" LỚN
+          // NẾU SỐ LƯỢNG LÀ 0
           <button 
-            onClick={() => addToCart(dish)}
+            onClick={handleAdd} // <-- SỬA
             className="flex-shrink-0 bg-amber-500 text-white p-3 rounded-full
                        hover:bg-amber-600 transition-colors shadow-lg"
             aria-label={`Thêm ${dish.name} vào giỏ`}
@@ -42,10 +50,10 @@ const OrderItemCard = ({ dish }) => {
             <Plus size={20} />
           </button>
         ) : (
-          // NẾU SỐ LƯỢNG > 0, HIỂN THỊ BỘ ĐẾM
+          // NẾU SỐ LƯỢNG > 0
           <>
             <button
-              onClick={() => updateQuantity(dish._id, quantity - 1)}
+              onClick={handleRemove} // <-- SỬA
               className="p-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-colors"
             >
               <Minus size={16} />
@@ -56,7 +64,7 @@ const OrderItemCard = ({ dish }) => {
             </span>
             
             <button
-              onClick={() => addToCart(dish)} // Hàm addToCart sẽ tự +1
+              onClick={handleAdd} // <-- SỬA
               className="p-2 rounded-full bg-amber-500 text-white hover:bg-amber-600 transition-colors"
             >
               <Plus size={16} />
