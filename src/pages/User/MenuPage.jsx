@@ -1,163 +1,127 @@
-// src/pages/MenuPage.jsx
-import React, { useState, useEffect, useRef } from 'react'; 
-import MenuSidebar from "../../components/menu/MenuSidebar";
-import MenuMobileNav from "../../components/menu/MenuMobileNav";
-import MenuContent from "../../components/menu/MenuContent";
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Loader, AlertCircle } from 'lucide-react';
+import MenuSidebar from '../../components/menu/MenuSidebar';
+import MenuContent from '../../components/menu/MenuContent';
 
-// Hàm API call (có thể tách ra file apiService.js nếu muốn)
-const fetchMenuData = async () => {
-  // Sửa lỗi API: dùng VITE_API_URL và đúng endpoint là /full-menu
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-  const response = await fetch(`${API_URL}/dishes/full-menu`);
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to fetch menu data (Status: ${response.status}, Error: ${errorText.substring(0, 50)}...)`);
-  }
-  
-  const result = await response.json();
-  
-  if (result.success && Array.isArray(result.data)) {
-    return result.data;
-  } else {
-    throw new Error("Dữ liệu trả về không đúng định dạng hoặc thiếu trường 'success: true'.");
-  }
-};
-
-
-// Component trang chính
 const MenuPage = () => {
-  const [menuData, setMenuData] = useState([]);
+  const [dishes, setDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const categoryRefs = useRef({}); 
-  const [activeCategory, setActiveCategory] = useState(null); 
+  const [activeCategory, setActiveCategory] = useState(null);
+  const categoryRefs = useRef({});
 
-  // Hàm cuộn mượt mà (Giữ nguyên)
-  const scrollToCategory = (categoryName) => {
-    const ref = categoryRefs.current[categoryName];
-    if (ref) {
-      const yOffset = -120; // Offset cho sticky header
-      const y = ref.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-      setActiveCategory(categoryName);
-    }
-  };
-  
-  // EFFECT: Intersection Observer (Giữ nguyên)
+  // 1. Fetch dữ liệu món ăn
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveCategory(entry.target.dataset.category);
-          }
-        });
-      },
-      {
-        rootMargin: '-120px 0px -70% 0px', 
-        threshold: 0
-      }
-    );
-
-    Object.values(categoryRefs.current).forEach(ref => {
-      if (ref) {
-        observer.observe(ref);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [menuData]); // Chạy lại khi menuData thay đổi (để gán ref mới)
-
-  // EFFECT: Fetch Data từ API (Giữ nguyên, chỉ gọi hàm fetchMenuData)
-  useEffect(() => {
-    const loadMenu = async () => {
+    const fetchDishes = async () => {
+      setIsLoading(true);
       try {
-        const data = await fetchMenuData();
-        setMenuData(data);
-        if (data.length > 0) {
-          setActiveCategory(data[0].categoryName);
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const response = await fetch(`${API_URL}/dishes`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setDishes(data.data);
+          if (data.data.length > 0) {
+            const firstCategory = [...new Set(data.data.map(d => d.category))].sort()[0];
+            setActiveCategory(firstCategory);
+          }
+        } else {
+          throw new Error(data.message);
         }
       } catch (err) {
-        console.error("Lỗi khi fetch menu:", err);
-        setError('Không thể tải thực đơn. Vui lòng kiểm tra Server và MongoDB.');
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
     };
-
-    loadMenu();
+    fetchDishes();
   }, []);
-  
-  // --- Các trạng thái Loading và Error (Giữ nguyên) ---
-  if (isLoading) {
-    return <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white text-center text-2xl">Đang tải thực đơn...</div>;
-  }
 
-  if (error || menuData.length === 0) {
-    return (
-      <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white text-center">
-        <div className="max-w-xl mx-auto p-10 bg-gray-800 rounded-xl shadow-2xl">
-          <h2 className="text-3xl font-bold text-red-500 mb-4">Lỗi tải thực đơn</h2>
-          <p className="text-xl text-gray-400">
-            {error || "Không tìm thấy món ăn nào. Vui lòng đảm bảo Backend Server đang chạy và MongoDB đã kết nối thành công."}
-          </p>
-        </div>
-      </div>
+  // 2. Lấy danh sách Category
+  const categories = useMemo(() => {
+    return [...new Set(dishes.map(d => d.category))].sort();
+  }, [dishes]);
+
+  // 3. Xử lý cuộn trang
+  const scrollToCategory = (category) => {
+    const element = categoryRefs.current[category];
+    if (element) {
+      const yOffset = -100; 
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  // 4. Active category khi cuộn
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveCategory(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: '-100px 0px -70% 0px', threshold: 0 }
     );
-  }
 
-  // --- Render Layout chính ---
+    Object.values(categoryRefs.current).forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [categories]);
+
   return (
-    <div className="pt-32 pb-20 bg-gray-900 min-h-screen text-white font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="pt-20 pb-20 bg-gray-900 min-h-screen text-white relative font-sans">
+      
+      {/* Họa tiết nền chìm */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(#fbbf24 1px, transparent 1px)", backgroundSize: "30px 30px" }}>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Tiêu đề trang Menu (Giữ nguyên) */}
-        <header className="text-center mb-16">
-          <p className="text-amber-500 font-serif uppercase tracking-widest mb-2">
-            TOÀN BỘ THỰC ĐƠN
-          </p>
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight font-serif text-white">
-            Bộ Sưu Tập L'ESSENCE
-          </h1>
-          <p className="text-gray-400 mt-4 text-lg max-w-xl mx-auto">
-            Khám phá hành trình ẩm thực Dưỡng Sinh, nơi kỹ thuật Fine Dining Pháp gặp gỡ triết lý cân bằng Á Đông.
-          </p>
-        </header>
-
-        {/* BỐ CỤC 2 CỘT */}
-        <div className="flex flex-col lg:flex-row gap-10">
-          
-          {/* CỘT 1: SIDEBAR (Dùng component mới) */}
-          <MenuSidebar 
-            categories={menuData}
-            activeCategory={activeCategory}
-            onScrollToCategory={scrollToCategory}
-          />
-
-          {/* CỘT 2: NỘI DUNG CHÍNH (Bao gồm MenuContent và MobileNav) */}
-          <div className="flex-grow">
-            {/* Nav cho Mobile (Dùng component mới) */}
-            <MenuMobileNav 
-              categories={menuData}
-              activeCategory={activeCategory}
-              onScrollToCategory={scrollToCategory}
-            />
-            
-            {/* Content (Dùng component mới) */}
-            <MenuContent 
-              menuData={menuData}
-              categoryRefs={categoryRefs}
-            />
-          </div>
-
+        {/* HERO HEADER */}
+        <div className="text-center py-16">
+            <h1 className="text-5xl md:text-6xl font-bold font-serif text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 mb-6">
+                Thực Đơn Thượng Hạng
+            </h1>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto font-light leading-relaxed">
+                Trải nghiệm bản giao hưởng của hương vị, nơi nghệ thuật ẩm thực thăng hoa cùng những nguyên liệu tuyển chọn khắt khe nhất.
+            </p>
+            <div className="w-24 h-1 bg-amber-500 mx-auto mt-8 rounded-full"></div>
         </div>
 
-        {/* Ghi chú chân trang (Giữ nguyên) */}
-        <footer className="text-center mt-20 text-gray-500 italic text-sm">
-          <p>* Giá trên chưa bao gồm 10% VAT và 5% phí phục vụ. Vui lòng hỏi Sommelier để được tư vấn rượu vang.</p>
-        </footer>
+        {/* MAIN CONTENT */}
+        {isLoading ? (
+          <div className="flex justify-center h-64 items-center"><Loader className="w-12 h-12 text-amber-500 animate-spin"/></div>
+        ) : error ? (
+          <div className="text-red-400 text-center p-4 bg-red-900/20 rounded-lg border border-red-800"><AlertCircle className="inline mr-2"/> {error}</div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-12">
+            {/* Sidebar Danh mục */}
+            <aside className="lg:w-1/4">
+                <div className="sticky top-28">
+                    <MenuSidebar 
+                        categories={categories} 
+                        activeCategory={activeCategory} 
+                        onSelect={scrollToCategory} 
+                    />
+                </div>
+            </aside>
+
+            {/* Danh sách món */}
+            <main className="lg:w-3/4">
+                <MenuContent 
+                    dishes={dishes} 
+                    categories={categories} 
+                    refs={categoryRefs} 
+                />
+            </main>
+          </div>
+        )}
       </div>
     </div>
   );

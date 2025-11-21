@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { X } from 'lucide-react';
 
-// Component Input Tùy chỉnh (để code gọn hơn)
+// Component Input Tùy chỉnh
 const FormInput = ({ label, id, ...props }) => (
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-300 mb-1">
@@ -85,7 +85,7 @@ const DishFormModal = ({ isOpen, onClose, onSaveSuccess, dishToEdit }) => {
         method: method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // <-- GỬI TOKEN ADMIN
+          'Authorization': `Bearer ${token}`, // GỬI TOKEN ADMIN
         },
         body: JSON.stringify(formData),
       });

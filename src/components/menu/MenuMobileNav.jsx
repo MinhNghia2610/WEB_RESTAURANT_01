@@ -1,6 +1,6 @@
 // src/components/menu/MenuMobileNav.jsx
 import React from 'react';
-import { getCategoryIcon } from '../../utils/menuUtils'; // <-- Import từ file utils
+import { getCategoryIcon } from '../../utils/menuUtils'; // Import từ file utils
 
 /**
  * Thanh điều hướng danh mục cho màn hình mobile (cuộn ngang).

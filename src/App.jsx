@@ -1,7 +1,10 @@
-// src/App.jsx (ĐÃ THAY THẾ ROUTE "orders" CỦA ADMIN)
+// App.jsx (Đã Cập nhật Router cho chức năng Reset Password)
 
 import React, { useState } from 'react'; 
 import { Routes, Route } from 'react-router-dom';
+// Import thư viện Toastify
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // *************** IMPORTS LAYOUTS ***************
 import UserLayout from './components/layout/UserLayout.jsx'; 
@@ -9,6 +12,7 @@ import ProtectedRoute from './components/admin/ProtectedRoute.jsx';
 
 // *************** IMPORTS AUTH PAGES ***************
 import AuthModal from './components/auth/AuthModal.jsx';
+// Chú ý: Component ResetPasswordPage được sử dụng trực tiếp, không cần phải là Modal
 import ResetPasswordPage from './pages/User/ResetPasswordPage.jsx'; 
 
 // *************** IMPORTS USER PAGES ***************
@@ -25,58 +29,59 @@ import MyOrdersPage from './pages/User/MyOrdersPage.jsx';
 import DashboardPage from './pages/Admin/DashboardPage.jsx'; 
 import MenuManagement from './pages/Admin/MenuManagement.jsx'; 
 import ReservationManagement from './pages/Admin/ReservationManagement.jsx'; 
-
-// ⭐️ 1. IMPORT TRANG QUẢN LÝ ĐƠN HÀNG MỚI
 import OrderManagement from './pages/Admin/OrderManagement.jsx'; 
 
 // *************** IMPORTS MODALS TOÀN CỤC ***************
 import CartModal from './components/cart/CartModal.jsx'; 
 
 function App() {
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    return (
-        <> 
-            <Routes>
+    return (
+        <> 
+            {/* Container hiển thị thông báo toàn cục */}
+            <ToastContainer position="top-right" autoClose={3000} />
+
+            <Routes>
+                
+                {/* 🏆 ROUTE ĐẶT LẠI MẬT KHẨU (Cần có tham số :token) */}
+                {/* Đặt route này ở ngoài UserLayout để nó chiếm toàn bộ trang */}
+                <Route path="/reset-password/:token" element={<ResetPasswordPage />} /> 
                 
-                <Route path="/reset-password" element={<ResetPasswordPage />} /> 
+                {/* I. ROUTES CÔNG KHAI (USER) */}
+                <Route path="/" element={<UserLayout setIsAuthModalOpen={setIsAuthModalOpen} />}>
+                    <Route index element={<HomePageContent />} /> 
+                    <Route path="gioi-thieu" element={<GioiThieuPage />} />
+                    <Route path="thuc-don" element={<MenuPage />} />
+                    <Route path="dat-mon-online" element={<OrderOnlinePage />} />
+                    <Route path="dat-ban" element={<ReservationPage />} /> 
+                    <Route path="thanh-toan" element={<CheckoutPage />} />
+                    <Route path="dat-hang-thanh-cong" element={<OrderSuccessPage />} />
+                    <Route path="lich-su-don-hang" element={<MyOrdersPage />} />
+                    <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
+                </Route>
 
-                {/* I. ROUTES CÔNG KHAI (USER) */}
-                <Route path="/" element={<UserLayout setIsAuthModalOpen={setIsAuthModalOpen} />}>
-                    <Route index element={<HomePageContent />} /> 
-                    <Route path="gioi-thieu" element={<GioiThieuPage />} />
-                    <Route path="thuc-don" element={<MenuPage />} />
-                    <Route path="dat-mon-online" element={<OrderOnlinePage />} />
-                    <Route path="dat-ban" element={<ReservationPage />} /> 
-                    <Route path="thanh-toan" element={<CheckoutPage />} />
-                    <Route path="dat-hang-thanh-cong" element={<OrderSuccessPage />} />
-                    <Route path="lich-su-don-hang" element={<MyOrdersPage />} />
-                    <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
-                </Route>
+                {/* II. ROUTES QUẢN TRỊ (ADMIN) */}
+                <Route path="/admin" element={<ProtectedRoute />}> 
+                    <Route index element={<DashboardPage />} />
+                    <Route path="dashboard" element={<DashboardPage />} />
+                    
+                    <Route path="reservations" element={<ReservationManagement />} /> 
+                    <Route path="menu" element={<MenuManagement />} />
+                    <Route path="orders" element={<OrderManagement />} /> 
+                    
+                    <Route path="*" element={<h1>404 - Trang Admin không tìm thấy</h1>} />
+                </Route>
+            </Routes>
 
-                {/* II. ROUTES QUẢN TRỊ (ADMIN) */}
-                <Route path="/admin" element={<ProtectedRoute />}> 
-                    <Route index element={<DashboardPage />} />
-                    <Route path="reservations" element={<ReservationManagement />} /> 
-                    <Route path="dashboard" element={<DashboardPage />} />
-                    <Route path="menu" element={<MenuManagement />} />
-                    
-                    {/* ⭐️ 2. THAY THẾ PLACEHOLDER BẰNG TRANG MỚI */}
-                    <Route path="orders" element={<OrderManagement />} /> 
-                    
-                    <Route path="reports" element={<h1>Báo cáo & Thống kê Placeholder</h1>} />
-                    <Route path="*" element={<h1>404 - Trang Admin không tìm thấy</h1>} />
-                </Route>
-            </Routes>
-
-            {/* MODALS TOÀN CỤC */}
-            <AuthModal 
-                isOpen={isAuthModalOpen} 
-                onClose={() => setIsAuthModalOpen(false)} 
-            />
-            <CartModal />
-        </>
-    );
+            {/* MODALS TOÀN CỤC */}
+            <AuthModal 
+                isOpen={isAuthModalOpen} 
+                onClose={() => setIsAuthModalOpen(false)} 
+            />
+            <CartModal />
+        </>
+    );
 }
 
 export default App;

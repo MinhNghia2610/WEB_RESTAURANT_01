@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext.jsx';
 
 // Import các Components dùng trong Layout User
 import Navbar from './Navbar.jsx'; 
-// Đã loại bỏ import CartSidebar
 import AuthModal from '../auth/AuthModal.jsx';
 import Footer from './Footer.jsx';
 
@@ -25,8 +24,7 @@ const UserLayout = () => {
     // Lấy trạng thái từ Context
     const { isAuthenticated, userRole } = useAuth(); // LẤY TRẠNG THÁI TỪ CONTEXT
 
-    // State dùng chung cho Layout User (Chỉ còn Auth Modal)
-    // Đã loại bỏ: const [isCartOpen, setIsCartOpen] = useState(false); 
+    // State dùng chung cho Layout User
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); 
     const location = useLocation(); 
 
@@ -42,9 +40,8 @@ const UserLayout = () => {
         <div className="App font-sans">
             <ScrollToTop /> 
             
-            {/* 1. Navbar (Hiển thị cố định) */}
+            {/* 1. Navbar */}
             <Navbar 
-                // Đã loại bỏ: setIsCartOpen={setIsCartOpen} 
                 setIsAuthModalOpen={setIsAuthModalOpen} 
                 currentPage={location.pathname}
             />
@@ -55,11 +52,10 @@ const UserLayout = () => {
                 <Outlet /> 
             </main>
             
-            {/* 3. Modals/Sidebars (Chỉ còn Auth Modal) */}
-            {/* Đã loại bỏ: <CartSidebar isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} /> */}
+            {/* 3. Modals/Sidebars */}
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             
-            {/* 4. Footer (Hiển thị cố định) */}
+            {/* 4. Footer */}
             <Footer /> 
         </div>
     );

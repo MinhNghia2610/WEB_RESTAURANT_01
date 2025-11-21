@@ -1,141 +1,115 @@
-// src/components/cart/CartModal.jsx (ĐÃ THÊM NÚT XÓA TẤT CẢ)
-
 import React from 'react';
-import { useCart } from '../../context/CartContext'; 
-import { X, ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
+import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// Component con (Không thay đổi)
-const CartItem = ({ item, updateQuantity, removeFromCart }) => (
-  <div className="flex items-center gap-4 py-4 border-b border-gray-200">
-    <img 
-      src={item.imageURL || 'https://placehold.co/100x100'} 
-      alt={item.name}
-      className="w-20 h-20 object-cover rounded-md"
-    />
-    <div className="flex-grow">
-      <h4 className="font-semibold text-gray-800">{item.name}</h4>
-      <p className="text-sm text-gray-500">
-        {item.price.toLocaleString('vi-VN')} VNĐ
-      </p>
-      <div className="flex items-center gap-2 mt-2">
-        <button 
-          onClick={() => updateQuantity(item._id, item.quantity - 1)}
-          className="p-1 rounded-full bg-gray-200 hover:bg-gray-300"
-        >
-          <Minus size={16} />
-        </button>
-        <span className="font-bold w-8 text-center">{item.quantity}</span>
-        <button 
-          onClick={() => updateQuantity(item._id, item.quantity + 1)}
-          className="p-1 rounded-full bg-gray-200 hover:bg-gray-300"
-        >
-          <Plus size={16} />
-        </button>
-      </div>
-    </div>
-    <button 
-      onClick={() => removeFromCart(item._id)}
-      className="text-red-500 hover:text-red-700"
-    >
-      <Trash2 size={20} />
-    </button>
-  </div>
-);
-
-// Component Modal chính
 const CartModal = () => {
   const { 
-    cartItems, 
     isCartOpen, 
     closeCart, 
+    cartItems, 
     updateQuantity, 
     removeFromCart, 
-    clearCart, // <-- 1. LẤY HÀM clearCart TỪ CONTEXT
-    itemCount, 
     totalPrice 
   } = useCart();
 
-  if (!isCartOpen) return null; 
+  if (!isCartOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/50 z-50"
-      onClick={closeCart}
-    >
+    <div className="fixed inset-0 z-[60] flex justify-end">
+      {/* Overlay làm mờ nền */}
       <div 
-        className="fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-xl z-[60] flex flex-col"
-        onClick={(e) => e.stopPropagation()} 
-      >
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        onClick={closeCart}
+      ></div>
+
+      {/* Sidebar Giỏ Hàng */}
+      <div className="relative w-full max-w-md bg-gray-900 h-full shadow-2xl border-l border-gray-800 flex flex-col transform transition-transform duration-300 animate-slide-in-right">
         
-        {/* 1. Header Modal */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold font-serif text-gray-900 flex items-center gap-2">
-            <ShoppingBag size={24} />
-            Giỏ Hàng ({itemCount})
-          </h2>
-          <button 
-            onClick={closeCart} 
-            className="text-gray-500 hover:text-red-600"
-          >
-            <X size={28} />
-          </button>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-800 bg-gray-900">
+            <h2 className="text-2xl font-bold font-serif text-white flex items-center gap-2">
+                <ShoppingBag className="text-amber-500" /> Giỏ Hàng
+                <span className="text-sm font-sans font-normal text-gray-500 ml-2">({cartItems.length} món)</span>
+            </h2>
+            <button onClick={closeCart} className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-full">
+                <X size={24} />
+            </button>
         </div>
 
-        {/* 2. Danh sách món hàng */}
-        <div className="flex-grow p-6 overflow-y-auto">
-          
-          {/* ============================================== */}
-          {/* ⭐️ SỬA 1: THÊM NÚT "XÓA TẤT CẢ" */}
-          {/* ============================================== */}
-          {cartItems.length > 0 && (
-            <div className="flex justify-end mb-4">
-              <button
-                onClick={clearCart} // <-- 2. GỌI HÀM KHI NHẤN
-                className="text-sm text-gray-500 hover:text-red-600 hover:underline flex items-center gap-1"
-              >
-                <Trash2 size={14} />
-                Xóa tất cả
-              </button>
-            </div>
-          )}
+        {/* Body: Danh sách món */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            {cartItems.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4">
+                    <ShoppingBag size={64} strokeWidth={1} className="opacity-20" />
+                    <p>Giỏ hàng đang trống</p>
+                    <button onClick={closeCart} className="text-amber-500 hover:text-amber-400 font-bold text-sm underline">
+                        Quay lại thực đơn
+                    </button>
+                </div>
+            ) : (
+                cartItems.map((item) => (
+                    <div key={item._id} className="flex gap-4 bg-gray-800/50 p-4 rounded-xl border border-gray-700/50 hover:border-amber-500/30 transition-all group">
+                        {/* Ảnh */}
+                        <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-600 shrink-0">
+                            <img src={item.imageURL || 'https://placehold.co/100'} alt={item.name} className="w-full h-full object-cover" />
+                        </div>
 
-          {cartItems.length === 0 ? (
-            <p className="text-gray-500 text-center mt-10">Giỏ hàng của bạn đang trống.</p>
-          ) : (
-            <div>
-              {cartItems.map(item => (
-                <CartItem 
-                  key={item._id} 
-                  item={item} 
-                  updateQuantity={updateQuantity}
-                  removeFromCart={removeFromCart}
-                />
-              ))}
-            </div>
-          )}
+                        {/* Thông tin & Điều khiển */}
+                        <div className="flex-1 flex flex-col justify-between">
+                            <div className="flex justify-between items-start">
+                                <h3 className="font-bold text-white text-sm line-clamp-2 pr-2">{item.name}</h3>
+                                <button 
+                                    onClick={() => removeFromCart(item._id)}
+                                    className="text-gray-500 hover:text-red-500 transition-colors"
+                                    title="Xóa món"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                            
+                            <div className="flex justify-between items-end mt-2">
+                                <p className="text-amber-500 font-bold text-sm">{item.price.toLocaleString('vi-VN')}₫</p>
+                                
+                                {/* Bộ điều chỉnh số lượng */}
+                                <div className="flex items-center bg-gray-900 rounded-lg border border-gray-700">
+                                    <button 
+                                        onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                                        className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-l-lg transition-colors"
+                                    >
+                                        <Minus size={14} />
+                                    </button>
+                                    <span className="w-8 text-center text-sm font-bold text-white select-none">{item.quantity}</span>
+                                    <button 
+                                        onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                                        className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-r-lg transition-colors"
+                                    >
+                                        <Plus size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))
+            )}
         </div>
 
-        {/* 3. Footer Modal (Tổng tiền & Thanh toán) */}
+        {/* Footer: Tổng tiền & Nút thanh toán */}
         {cartItems.length > 0 && (
-          <div className="p-6 border-t border-gray-200 bg-gray-50">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-lg font-semibold text-gray-800">Tổng cộng:</span>
-              <span className="text-2xl font-bold text-red-600">
-                {totalPrice.toLocaleString('vi-VN')} VNĐ
-              </span>
+            <div className="p-6 bg-gray-800 border-t border-gray-700 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+                <div className="flex justify-between items-center mb-6">
+                    <span className="text-gray-400">Tổng cộng:</span>
+                    <span className="text-2xl font-bold text-amber-500">{totalPrice.toLocaleString('vi-VN')}₫</span>
+                </div>
+                <Link 
+                    to="/thanh-toan" 
+                    onClick={closeCart}
+                    className="w-full py-4 bg-gradient-to-r from-amber-600 to-amber-500 hover:to-amber-400 text-gray-900 font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all transform hover:-translate-y-1"
+                >
+                    TIẾN HÀNH THANH TOÁN <ArrowRight size={20} />
+                </Link>
             </div>
-            <Link to="/thanh-toan"> 
-              <button 
-                onClick={closeCart} 
-                className="w-full bg-red-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors"
-              >
-                Tiến hành Thanh toán
-              </button>
-            </Link>
-          </div>
         )}
-        
       </div>
     </div>
   );

@@ -1,22 +1,19 @@
-// src/components/order/OrderSearchBar.jsx
 import React from 'react';
 import { Search } from 'lucide-react';
 
 const OrderSearchBar = ({ searchTerm, onSearchChange }) => {
   return (
-    <div className="relative mb-6">
+    <div className="relative w-full">
+      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <Search className="h-5 w-5 text-amber-500" />
+      </div>
       <input
         type="text"
-        placeholder="Tìm kiếm món ăn..."
+        className="block w-full pl-12 pr-4 py-4 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all shadow-lg"
+        placeholder="Tìm kiếm món ăn yêu thích..."
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full py-3 pl-12 pr-4 text-lg bg-gray-800 text-white
-                   border border-gray-700 rounded-lg 
-                   focus:outline-none focus:ring-2 focus:ring-amber-500"
       />
-      <div className="absolute top-0 left-0 flex items-center h-full pl-4">
-        <Search className="text-gray-500" />
-      </div>
     </div>
   );
 };

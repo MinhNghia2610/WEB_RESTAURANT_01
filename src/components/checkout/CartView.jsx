@@ -1,74 +1,44 @@
-// src/components/checkout/CartView.jsx
 import React from 'react';
 import { useCart } from '../../context/CartContext';
-import { Plus, Minus, Trash2 } from 'lucide-react';
 
-// Component con cho từng món hàng (phiên bản thu gọn)
-const CartViewItem = ({ item, updateQuantity, removeFromCart }) => (
-  <div className="flex items-start gap-3 py-4 border-b border-gray-600">
-    <img 
-      src={item.imageURL || 'https://placehold.co/100x100'} 
-      alt={item.name}
-      className="w-16 h-16 object-cover rounded-md flex-shrink-0"
-    />
-    <div className="flex-grow">
-      <h4 className="font-semibold text-amber-500">{item.name}</h4>
-      <p className="text-sm text-gray-400">
-        {item.price.toLocaleString('vi-VN')} VNĐ
-      </p>
-      
-      {/* Nút tăng giảm số lượng (thu nhỏ) */}
-      <div className="flex items-center gap-2 mt-1">
-        <button 
-          onClick={() => updateQuantity(item._id, item.quantity - 1)}
-          className="p-1 rounded-full bg-gray-700 hover:bg-gray-600 text-white"
-        >
-          <Minus size={14} />
-        </button>
-        <span className="font-bold w-6 text-center text-white">{item.quantity}</span>
-        <button 
-          onClick={() => updateQuantity(item._id, item.quantity + 1)}
-          className="p-1 rounded-full bg-gray-700 hover:bg-gray-600 text-white"
-        >
-          <Plus size={14} />
-        </button>
-      </div>
-    </div>
-    
-    {/* Giá tổng của món này */}
-    <div className="flex flex-col items-end flex-shrink-0">
-      <p className="font-bold text-white whitespace-nowrap">
-        {(item.price * item.quantity).toLocaleString('vi-VN')} VNĐ
-      </p>
-      {/* Nút Xóa (thu nhỏ) */}
-      <button 
-        onClick={() => removeFromCart(item._id)}
-        className="text-gray-500 hover:text-red-500 text-sm mt-1"
-      >
-        Xóa
-      </button>
-    </div>
-  </div>
-);
-
-// Component chính
 const CartView = () => {
-  const { cartItems, updateQuantity, removeFromCart } = useCart();
-
-  if (cartItems.length === 0) {
-    return <p className="text-gray-400">Giỏ hàng của bạn trống.</p>;
-  }
+  const { cartItems } = useCart();
 
   return (
-    // Thêm thanh cuộn nếu giỏ hàng quá dài
-    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-      {cartItems.map(item => (
-        <CartViewItem 
-          key={item._id} 
-          item={item} 
-          updateQuantity={updateQuantity}
-          removeFromCart={removeFromCart}
-        />
+    <div className="space-y-0 mb-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+      {cartItems.map((item) => (
+        <div key={item._id} className="flex justify-between items-center py-4 border-b border-gray-700/50 last:border-0 group hover:bg-gray-700/20 rounded-lg px-2 transition-colors">
+          <div className="flex items-center gap-4">
+            {/* Hình ảnh món ăn */}
+            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-600 group-hover:border-amber-500/50 transition-colors relative">
+                 <img 
+                    src={item.imageURL || 'https://placehold.co/100'} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover"
+                 />
+                 <div className="absolute bottom-0 right-0 bg-amber-500 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-tl-md">
+                    x{item.quantity}
+                 </div>
+            </div>
+            
+            {/* Thông tin */}
+            <div>
+              <h4 className="font-serif font-bold text-white text-sm line-clamp-1 group-hover:text-amber-400 transition-colors">
+                  {item.name}
+              </h4>
+              <p className="text-xs text-gray-400 mt-1">
+                  Đơn giá: {item.price.toLocaleString('vi-VN')}₫
+              </p>
+            </div>
+          </div>
+          
+          {/* Tổng tiền món */}
+          <div className="text-right">
+             <p className="font-bold text-amber-400 text-base font-sans">
+                {(item.price * item.quantity).toLocaleString('vi-VN')}₫
+             </p>
+          </div>
+        </div>
       ))}
     </div>
   );

@@ -1,4 +1,4 @@
-// src/components/auth/RegisterForm.jsx (ĐÃ THIẾT KẾ LẠI - DỰA TRÊN LOGIC CỦA BẠN)
+// src/components/auth/RegisterForm.jsx
 import { useState } from "react";
 
 // Nhận props từ AuthModal
@@ -11,14 +11,11 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ==========================================================
-  // LOGIC CỦA BẠN (GIỮ NGUYÊN - RẤT TỐT)
-  // ==========================================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    // --- Validation ---
+    // Kiểm tra mật khẩu xác nhận
     if (password !== confirmPassword) {
       setError("Mật khẩu xác nhận không khớp.");
       return;
@@ -56,14 +53,7 @@ const RegisterForm = ({ onRegisterSuccess, onSwitchToLogin }) => {
       setLoading(false);
     }
   };
-  // ==========================================================
-  // KẾT THÚC LOGIC
-  // ==========================================================
 
-
-  // ==========================================================
-  // GIAO DIỆN JSX (ĐÃ THIẾT KẾ LẠI THEME TỐI)
-  // ==========================================================
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Ô Tên */}

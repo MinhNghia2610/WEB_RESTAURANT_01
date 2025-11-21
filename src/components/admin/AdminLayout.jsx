@@ -1,7 +1,7 @@
-// src/components/AdminComponents/AdminLayout.jsx (ĐÃ THIẾT KẾ LẠI)
+// src/components/AdminComponents/AdminLayout.jsx
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar'; // File này chúng ta sẽ sửa ở bước 2
+import Sidebar from './Sidebar'; // Import Sidebar component để sử dụng trong layout
 import { useAuth } from '../../context/AuthContext'; // Import useAuth để dùng logout
 
 const AdminLayout = () => {
@@ -11,7 +11,7 @@ const AdminLayout = () => {
         // Nền tối cho toàn bộ trang Admin
         <div className="flex bg-gray-900 min-h-screen text-gray-200">
             
-            {/* 1. Sidebar (File này sẽ được sửa ở bước 2) */}
+            {/* 1. Sidebar */}
             <Sidebar />
 
             {/* 2. Main Content Container (ml-64 khớp với width của Sidebar) */}

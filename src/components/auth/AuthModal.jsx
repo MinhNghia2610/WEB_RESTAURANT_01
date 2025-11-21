@@ -3,7 +3,7 @@ import { useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import { X } from 'lucide-react'; // Import icon X
+import { X } from 'lucide-react';
 
 const AuthModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -67,7 +67,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           </p>
         )}
 
-        {/* Render component con (Giữ nguyên logic của bạn) */}
+        {/* Render component con */}
         
         {mode === 'login' && (
           <LoginForm

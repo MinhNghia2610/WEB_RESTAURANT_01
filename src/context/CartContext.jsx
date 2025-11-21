@@ -14,10 +14,10 @@ export const useCart = () => {
 
 // --- 2. Lấy giỏ hàng từ LocalStorage ---
 const getInitialCart = () => {
-  try {
+        try {
     const storedCart = localStorage.getItem('cartItems');
     return storedCart ? JSON.parse(storedCart) : [];
-  } catch (error) {
+        } catch (error) {
     console.error("Không thể phân tích giỏ hàng từ localStorage:", error);
     return [];
   }
@@ -33,7 +33,7 @@ export const CartProvider = ({ children }) => {
   const closeCart = () => setIsCartOpen(false);
 
   // Tự động lưu vào LocalStorage (Giữ nguyên)
-  useEffect(() => {
+    useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
@@ -78,7 +78,7 @@ export const CartProvider = ({ children }) => {
           : item
       );
     });
-  };
+    };
 
   // 3. HÀM LẤY SỐ LƯỢNG (HÀM MỚI - SỬA LỖI CRASH)
   // Dùng để DishCard biết hiển thị số 0 hay số 5
@@ -108,8 +108,8 @@ export const CartProvider = ({ children }) => {
           item._id === dishId ? { ...item, quantity: newQuantity } : item
         )
       );
-    }
-  };
+        }
+    };
 
   // Hàm Xóa sạch giỏ (Giữ nguyên)
   const clearCart = () => {
@@ -129,7 +129,7 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   // Cung cấp (Provide) giá trị
-  const value = {
+    const value = {
     cartItems,
     itemCount,
     totalPrice,
@@ -146,7 +146,7 @@ export const CartProvider = ({ children }) => {
     // ⭐️ CÁC HÀM CŨ CHO CARTMODAL ⭐️
     removeFromCart, // Xóa hẳn
     updateQuantity, // Đặt số lượng
-  };
+    };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };

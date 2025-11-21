@@ -1,9 +1,7 @@
-// src/pages/User/CheckoutPage.jsx (PHIÊN BẢN HOÀN CHỈNH)
+// src/pages/User/CheckoutPage.jsx
 import React from 'react';
 import { useCart } from '../../context/CartContext';
 import { Navigate } from 'react-router-dom';
-
-// 1. IMPORT 2 COMPONENT CON MÀ CHÚNG TA VỪA TẠO
 import CheckoutForm from '../../components/checkout/CheckoutForm';
 import CartView from '../../components/checkout/CartView';
 

@@ -1,4 +1,4 @@
-// src/pages/User/MyOrdersPage.jsx (ĐÃ THÊM CHI TIẾT ĐƠN HÀNG)
+// src/pages/User/MyOrdersPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Loader, AlertCircle, ClipboardList, User, Phone, MapPin, MessageSquare } from 'lucide-react';
@@ -109,7 +109,7 @@ const MyOrdersPage = () => {
                 {/* Nội dung chi tiết */}
                 <div className="p-5 space-y-4">
                   
-                  {/* 1. Danh sách món ăn (Giữ nguyên) */}
+                  {/* 1. Danh sách món ăn */}
                   <div className="space-y-3">
                     {order.orderItems.map((item) => (
                       <div key={item.dish} className="flex justify-between items-center text-sm">
@@ -126,7 +126,7 @@ const MyOrdersPage = () => {
                     ))}
                   </div>
 
-                  {/* 2. THÊM MỚI: Thông tin khách hàng */}
+                  {/* 2. Thông tin khách hàng */}
                   <div className="pt-4 border-t border-gray-700">
                     <h4 className="text-md font-semibold text-amber-500 mb-3">Thông tin chi tiết</h4>
                     <div className="space-y-2 text-sm text-gray-300">
@@ -153,7 +153,7 @@ const MyOrdersPage = () => {
                     </div>
                   </div>
 
-                  {/* 3. Tổng cộng và Ngày đặt (Giữ nguyên) */}
+                  {/* 3. Tổng cộng và Ngày đặt */}
                   <div className="pt-4 border-t border-gray-700 flex justify-between items-center">
                     <p className="text-xs text-gray-400">
                       Ngày đặt: {new Date(order.createdAt).toLocaleString('vi-VN')}

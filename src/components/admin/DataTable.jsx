@@ -1,5 +1,5 @@
 import React from 'react';
-// Import icons để làm cho bảng quản lý chuyên nghiệp hơn
+// Import icons từ lucide-react
 import { Trash2, Edit, CheckCircle } from 'lucide-react'; 
 
 const DataTable = ({ title, columns, data }) => {
@@ -12,7 +12,7 @@ const DataTable = ({ title, columns, data }) => {
         } else if (status === 'Chờ xử lý') {
             colorClass = 'bg-yellow-100 text-yellow-700';
         } else if (status === 'Đã hủy' || status === 'Đã hoàn thành') {
-            // Dùng màu đỏ cho đã hủy/hoàn thành (hoàn thành có thể dùng xanh dương nếu muốn)
+            // Dùng màu đỏ cho đã hủy/hoàn thành (hoàn thành có thể dùng xanh dương)
             colorClass = 'bg-red-100 text-red-700'; 
         }
         return (

@@ -1,4 +1,3 @@
-// src/pages/User/OrderOnlinePage.jsx (ĐÃ SỬA LỖI SCROLL-SPY)
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import OrderMenu from '../../components/order/OrderMenu';
 import OrderSidebar from '../../components/order/OrderSidebar';
@@ -12,10 +11,9 @@ const OrderOnlinePage = () => {
   const [error, setError] = useState(null);
   
   const [activeCategory, setActiveCategory] = useState(null);
-  // Khởi tạo categoryRefs.current LÀ MỘT OBJECT RỖNG
   const categoryRefs = useRef({});
 
-  // 1. Fetch toàn bộ món ăn (Giữ nguyên)
+  // 1. Fetch dữ liệu
   useEffect(() => {
     const fetchDishes = async () => {
       setIsLoading(true); 
@@ -27,9 +25,7 @@ const OrderOnlinePage = () => {
         
         const data = await response.json();
         if (data.success) {
-          // Lọc các món 'available' (nếu bạn có logic này)
-          // const availableDishes = data.data.filter(dish => dish.status === 'available');
-          const availableDishes = data.data; // Giả sử lấy tất cả
+          const availableDishes = data.data; 
           setMasterDishes(availableDishes);
 
           if (availableDishes.length > 0) {
@@ -37,7 +33,7 @@ const OrderOnlinePage = () => {
             setActiveCategory(firstCategory);
           }
         } else {
-          throw new Error(data.message || 'Dữ liệu món ăn trả về không hợp lệ.');
+          throw new Error(data.message || 'Dữ liệu không hợp lệ.');
         }
       } catch (err) {
         setError(err.message);
@@ -48,11 +44,9 @@ const OrderOnlinePage = () => {
     fetchDishes();
   }, []);
 
-  // 2. Lọc món ăn (Giữ nguyên)
+  // 2. Lọc món ăn
   const filteredDishes = useMemo(() => {
-    if (!searchTerm) {
-      return masterDishes; 
-    }
+    if (!searchTerm) return masterDishes; 
     const lowerSearchTerm = searchTerm.toLowerCase();
     return masterDishes.filter(dish =>
       dish.name.toLowerCase().includes(lowerSearchTerm) ||
@@ -60,32 +54,24 @@ const OrderOnlinePage = () => {
     );
   }, [masterDishes, searchTerm]);
 
-  // 3. Tạo danh sách danh mục (Giữ nguyên)
+  // 3. Danh sách danh mục
   const categories = useMemo(() => {
     const categorySet = new Set(filteredDishes.map(dish => dish.category));
     return [...categorySet].sort();
   }, [filteredDishes]);
 
-  // 4. Logic cuộn (Giữ nguyên)
+  // 4. Scroll
   const scrollToCategory = (categoryName) => {
-    // Bây giờ categoryRefs.current sẽ có các ref
     const ref = categoryRefs.current[categoryName];
     if (ref) {
-      const yOffset = -120; 
+      const yOffset = -100; 
       const y = ref.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
-      // setActiveCategory(categoryName); // Không cần thiết, Observer sẽ làm
     }
   };
 
-  // ==========================================================
-  // ⭐️ 5. SỬA LỖI LOGIC SCROLL-SPY (useEffect) ⭐️
-  // ==========================================================
+  // 5. Observer
   useEffect(() => {
-    // `categoryRefs.current` được `OrderMenu` gán trong khi render
-    // `useEffect` chạy SAU KHI render
-    // Vì vậy, `categoryRefs.current` đã được cập nhật ở đây
-    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -94,33 +80,21 @@ const OrderOnlinePage = () => {
           }
         });
       },
-      // rootMargin: Giao cắt khi ở 120px trên cùng (sau header)
-      // và 70% dưới cùng (chỉ lấy phần top 30% màn hình)
-      { rootMargin: '-120px 0px -70% 0px', threshold: 0 } 
+      { rootMargin: '-100px 0px -70% 0px', threshold: 0 } 
     );
 
-    // Lấy các refs HIỆN TẠI
     const currentRefs = categoryRefs.current;
-    
-    // Bắt đầu theo dõi tất cả
     Object.values(currentRefs).forEach(ref => {
       if (ref) observer.observe(ref);
     });
 
-    // Hàm dọn dẹp: Ngừng theo dõi tất cả
     return () => {
       Object.values(currentRefs).forEach(ref => {
         if (ref) observer.unobserve(ref);
       });
       observer.disconnect();
     };
-    
-  // Phụ thuộc vào `categories`. Khi danh sách category thay đổi
-  // (do tìm kiếm), chúng ta cần chạy lại để theo dõi các ref mới.
   }, [categories]); 
-
-
-  // === RENDER GIAO DIỆN ===
 
   const renderContent = () => {
     if (isLoading) {
@@ -132,45 +106,53 @@ const OrderOnlinePage = () => {
     }
     if (error) {
       return (
-        <div className="text-red-400 bg-red-900/50 p-4 rounded-lg border border-red-700 flex items-center gap-3">
+        <div className="text-red-400 bg-red-900/20 p-4 rounded-lg border border-red-800 flex items-center gap-3 justify-center">
           <AlertCircle />
           <p><span className="font-bold">Lỗi:</span> {error}</p>
         </div>
       );
     }
-    return (
-      <OrderMenu dishes={filteredDishes} categoryRefs={categoryRefs} />
-    );
+    return <OrderMenu dishes={filteredDishes} categoryRefs={categoryRefs} />;
   };
 
   return (
-    <div className="pt-28 pb-20 bg-gray-900 min-h-screen text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="pt-28 pb-20 bg-gray-900 min-h-screen text-white relative">
+      {/* Họa tiết nền */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #fbbf24 1px, transparent 0)", backgroundSize: "40px 40px" }}>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        <header className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold font-serif text-white">
-            Đặt Món Online
+        <header className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-extrabold font-serif text-white mb-3">
+            Thực Đơn <span className="text-amber-500">Trực Tuyến</span>
           </h1>
-          <p className="text-gray-400 mt-2 text-lg max-w-xl mx-auto">
-            Chọn các món ăn yêu thích của bạn và thêm vào giỏ hàng.
+          <div className="w-24 h-1 bg-amber-500 mx-auto rounded-full mb-4"></div>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            Khám phá hương vị tinh hoa và đặt món ngay tại nhà.
           </p>
         </header>
 
-        <div className="flex flex-col lg:flex-row gap-10">
+        <div className="flex flex-col lg:flex-row gap-8">
           
-          <OrderSidebar 
-            categories={categories} 
-            activeCategory={activeCategory}
-            onScrollToCategory={scrollToCategory}
-          />
+          {/* Sidebar Danh mục (Sticky) */}
+          <aside className="lg:w-1/4">
+             <OrderSidebar 
+                categories={categories} 
+                activeCategory={activeCategory}
+                onScrollToCategory={scrollToCategory}
+             />
+          </aside>
 
-          <main className="flex-grow">
+          {/* Nội dung chính */}
+          <main className="lg:w-3/4">
             <OrderSearchBar 
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
             />
             
-            <div className="bg-gray-800 p-6 md:p-8 rounded-xl shadow-lg border border-gray-700">
+            <div className="mt-6 min-h-[400px]">
               {renderContent()}
             </div>
           </main>

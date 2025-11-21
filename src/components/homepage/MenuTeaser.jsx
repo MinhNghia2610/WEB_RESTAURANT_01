@@ -1,86 +1,70 @@
-// src/components/homepage/MenuTeaser.jsx
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Loader, AlertCircle } from 'lucide-react';
-// Import 'DishCard' từ thư mục 'common'
-import DishCard from '../common/DishCard'; 
+import { ArrowRight, Star } from 'lucide-react';
+
+const featuredDishes = [
+    {
+        id: 1,
+        name: "Bò Wagyu Dát Vàng",
+        desc: "Thịt bò Wagyu A5 thượng hạng, nướng trên đá muối Himalaya, phủ vàng thực phẩm 24K.",
+        price: "2.500.000",
+        img: "https://res.cloudinary.com/drehgc3kg/image/upload/v1763644841/photo-1544025162-d76694265947_wynsdk.avif"
+    },
+    {
+        id: 2,
+        name: "Tôm Hùm Alaska Sốt Kem",
+        desc: "Tôm hùm tươi sống bắt tại hồ, chế biến cùng sốt kem nấm Truffle đen quý hiếm.",
+        price: "1.890.000",
+        img: "https://res.cloudinary.com/drehgc3kg/image/upload/v1763644814/photo-1533777857889-4be7c70b33f7_yuomnd.avif"
+    },
+    {
+        id: 3,
+        name: "Gan Ngỗng Pháp Áp Chảo",
+        desc: "Gan ngỗng béo ngậy nhập khẩu từ Pháp, ăn kèm sốt mâm xôi và bánh mì Brioche.",
+        price: "950.000",
+        img: "https://res.cloudinary.com/drehgc3kg/image/upload/v1763644754/UDP3CWDZPVA3BK2LNI2AAST26E_ivyx0g_vzpiux.jpg"
+    }
+];
 
 const MenuTeaser = () => {
-  const [dishes, setDishes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchTeaserDishes = async () => {
-      try {
-        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-        // Gọi API lấy tất cả món ăn
-        const response = await fetch(`${API_URL}/dishes`); 
-        const data = await response.json();
-        
-        if (!data.success) {
-          throw new Error(data.message || 'Failed to fetch dishes');
-        }
-        
-        // Chỉ lấy 4 món đầu tiên để làm "teaser" (xem trước)
-        setDishes(data.data.slice(0, 4)); 
-        
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTeaserDishes();
-  }, []);
-
   return (
-    <section className="py-20 bg-gray-900 text-white">
+    <section className="py-20 bg-gray-900 border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Tiêu đề */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-extrabold font-serif text-amber-500">
-            Khám phá Thực đơn
-          </h2>
-          <p className="text-lg text-gray-400 mt-2 max-w-2xl mx-auto">
-            Một số món ăn đặc trưng được yêu thích nhất tại L'Essence.
-          </p>
+        <div className="text-center mb-16">
+            <h3 className="text-amber-500 font-bold uppercase tracking-widest text-sm mb-3">Thực Đơn Đặc Biệt</h3>
+            <h2 className="text-4xl md:text-5xl font-bold font-serif text-white">Tinh Hoa L'ESSENCE</h2>
         </div>
 
-        {/* Loading và Lỗi */}
-        {loading && (
-          <div className="flex justify-center">
-            <Loader className="w-12 h-12 text-amber-500 animate-spin" />
-          </div>
-        )}
-        {error && (
-          <div className="text-red-400 bg-red-900/50 p-4 rounded-lg border border-red-700 flex items-center gap-3 max-w-lg mx-auto">
-            <AlertCircle />
-            <p><span className="font-bold">Lỗi:</span> {error}</p>
-          </div>
-        )}
-
-        {/* Hiển thị các món ăn */}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {dishes.map(dish => (
-              <DishCard key={dish._id} dish={dish} showButton={false} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredDishes.map((dish) => (
+                <div key={dish.id} className="group bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 hover:border-amber-500/50 transition-all duration-500 hover:-translate-y-2">
+                    <div className="h-64 overflow-hidden relative">
+                        <img src={dish.img} alt={dish.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+                        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-amber-400 px-3 py-1 rounded-full text-sm font-bold border border-amber-500/30">
+                            {dish.price} ₫
+                        </div>
+                    </div>
+                    <div className="p-6">
+                        <div className="flex gap-1 mb-3 text-amber-500">
+                            {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="currentColor" />)}
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2 font-serif group-hover:text-amber-400 transition-colors">{dish.name}</h3>
+                        <p className="text-gray-400 text-sm line-clamp-2 mb-4">{dish.desc}</p>
+                        <Link to="/dat-mon-online" className="inline-flex items-center text-amber-500 text-sm font-bold hover:text-white transition-colors gap-2">
+                            Đặt món ngay <ArrowRight size={16} />
+                        </Link>
+                    </div>
+                </div>
             ))}
-          </div>
-        )}
-
-        {/* Nút bấm xem toàn bộ */}
-        <div className="text-center mt-12">
-          <Link
-            to="/thuc-don" // Dẫn đến trang Thực đơn đầy đủ
-            className="inline-block bg-amber-600 text-white font-bold py-3 px-8 rounded-lg text-lg
-                       hover:bg-amber-700 transition-colors shadow-lg"
-          >
-            Xem Toàn bộ Thực đơn
-          </Link>
         </div>
-        
+
+        <div className="text-center mt-12">
+            <Link to="/thuc-don" className="inline-block px-8 py-3 border border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-white rounded-full font-bold transition-all duration-300">
+                Xem Toàn Bộ Thực Đơn
+            </Link>
+        </div>
+
       </div>
     </section>
   );

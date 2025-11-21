@@ -1,211 +1,248 @@
 import React, { useState } from 'react';
-import { Calendar, Users, Clock, Mail, Phone, User } from 'lucide-react';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Calendar, Clock, Users, Phone, Mail, User, FileText, MapPin } from 'lucide-react';
 
 const ReservationPage = () => {
-    // State để lưu trữ dữ liệu form
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        email: '',
-        date: '',
-        time: '',
-        guests: 1,
-        notes: ''
-    });
+  const [formData, setFormData] = useState({
+    name: '', email: '', phone: '',
+    date: '', time: '', guests: 2, note: ''
+  });
+  const [loading, setLoading] = useState(false);
 
-    // State để hiển thị thông báo và dữ liệu đã đặt (Tĩnh)
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [submittedData, setSubmittedData] = useState(null);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    // Xử lý thay đổi input
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    // --- SỬA ĐỔI LOGIC GỬI DỮ LIỆU ---
+    // Backend cần nhận riêng lẻ: date (YYYY-MM-DD) và time (HH:MM)
+    // Không cần gộp thành reservationDateTime ở đây nữa vì Backend sẽ tự làm.
+    
+    if (!formData.date || !formData.time) {
+       toast.error('Vui lòng chọn đầy đủ Ngày và Giờ đặt bàn.');
+       setLoading(false);
+       return;
+    }
+
+    // Chuẩn hóa dữ liệu trước khi gửi (đảm bảo gửi đúng date, time riêng biệt)
+    const payload = {
+        ...formData,
+        // Đảm bảo gửi guests là số (Backend cần số)
+        guests: Number(formData.guests)
     };
 
-    // Xử lý submit form (Chỉ xử lý cục bộ, KHÔNG gửi lên Database/Server)
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        // --- LOGIC XỬ LÝ TĨNH (STATIC) ---
-        setSubmittedData(formData);
-        setIsSubmitted(true);
-        
-        // Reset form sau 5 giây
-        setTimeout(() => {
-            setIsSubmitted(false);
-            setFormData({
-                name: '',
-                phone: '',
-                email: '',
-                date: '',
-                time: '',
-                guests: 1,
-                notes: ''
-            });
-        }, 5000); // 5 giây
-    };
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      
+      // Gửi trực tiếp payload chứa date và time
+      const res = await axios.post(`${API_URL}/reservations`, payload);
+      
+      if (res.status === 201 || res.status === 200) {
+        toast.success('🎉 Gửi yêu cầu thành công! Nhà hàng sẽ liên hệ xác nhận sớm.');
+        // Reset form
+        setFormData({ name: '', email: '', phone: '', date: '', time: '', guests: 2, note: '' });
+      }
+    } catch (error) {
+      console.error("Lỗi gửi đặt bàn:", error);
+      // Hiển thị lỗi chi tiết từ Backend trả về
+      const serverMessage = error.response?.data?.message || 'Không thể gửi yêu cầu. Vui lòng thử lại.';
+      toast.error(`Lỗi: ${serverMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Hàm tiện ích để tạo input field
-    const InputField = ({ label, name, type = 'text', icon: Icon, min, max }) => {
-        // Xử lý giá trị ngày/giờ để tránh cảnh báo React về controlled input
-        const inputValue = name in formData ? formData[name] : '';
+  return (
+    <div className="pt-20 pb-20 bg-gray-900 min-h-screen text-white font-sans relative overflow-hidden">
+      <ToastContainer position="top-right" autoClose={4000} theme="dark" />
+      
+      {/* Họa tiết nền chìm */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" 
+           style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #fbbf24 1px, transparent 0)", backgroundSize: "40px 40px" }}>
+      </div>
 
-        return (
-            <div className="relative mb-6">
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                    {label}
-                </label>
-                {Icon && (
-                    <Icon className="absolute left-3 top-[37px] w-5 h-5 text-gray-400" />
-                )}
-                <input
-                    id={name}
-                    name={name}
-                    type={type}
-                    value={inputValue}
-                    onChange={handleChange}
-                    required
-                    min={min}
-                    max={max}
-                    // Đã thay đổi màu focus:ring-red-600/border-red-600 thành focus:ring-amber-600/border-amber-600
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-600 focus:border-amber-600 transition duration-150 ease-in-out placeholder-gray-500 ${Icon ? 'pl-10' : 'pl-4'} mt-1 appearance-none`}
-                    placeholder={`Nhập ${label.toLowerCase()}`}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* Header Section */}
+        <div className="text-center mb-12 animate-fade-in-up">
+            <h3 className="text-amber-500 font-bold uppercase tracking-[0.2em] text-sm mb-3">Liên Hệ & Đặt Chỗ</h3>
+            <h1 className="text-4xl md:text-6xl font-bold font-serif text-white mb-4">
+                Đặt Bàn <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200">Trực Tuyến</span>
+            </h1>
+            <div className="w-24 h-1 bg-amber-600 mx-auto rounded-full mb-6"></div>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto font-light">
+                Để đảm bảo trải nghiệm phục vụ tốt nhất, quý khách vui lòng đặt bàn trước ít nhất 2 giờ.
+            </p>
+        </div>
+
+        <div className="bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border border-gray-700 flex flex-col lg:flex-row animate-fade-in-up delay-100">
+            
+            {/* CỘT TRÁI: THÔNG TIN & HÌNH ẢNH */}
+            <div className="lg:w-2/5 relative">
+                <div className="absolute inset-0 bg-black/40 z-10"></div>
+                <img 
+                    src="https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
+                    alt="Dining Room" 
+                    className="w-full h-full object-cover"
                 />
-            </div>
-        );
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-inter">
-            {/* Tailwind CSS Script for Inter font and general styling */}
-            <script src="https://cdn.tailwindcss.com"></script>
-
-            <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-12">
-                    <h2 className="text-5xl font-extrabold text-gray-900 mb-2">
-                        ĐẶT BÀN ONLINE
-                    </h2>
-                    <p className="text-xl text-gray-600">
-                        Form chỉ xử lý dữ liệu cục bộ và hiển thị kết quả thành công.
-                    </p>
-                </div>
-
-                <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-gray-100">
+                <div className="absolute inset-0 z-20 p-10 flex flex-col justify-between bg-gradient-to-t from-gray-900 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-gray-900/50 lg:to-gray-900/90">
+                    <div>
+                        <h3 className="text-3xl font-serif font-bold text-white mb-2">L'ESSENCE</h3>
+                        <p className="text-amber-400 text-sm uppercase tracking-widest">Fine Dining Restaurant</p>
+                    </div>
                     
-                    {/* --- HIỂN THỊ KHI ĐẶT THÀNH CÔNG (TĨNH) --- */}
-                    {isSubmitted ? (
-                        <div className="text-center p-8 bg-green-50 rounded-xl animate-fadeIn">
-                            <svg className="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <h3 className="text-3xl font-bold text-green-800 mb-3">
-                                Đặt Bàn Thành Công!
-                            </h3>
-                            <p className="text-gray-700 mb-6">
-                                Cảm ơn bạn, dữ liệu đã được ghi nhận cục bộ.
-                            </p>
-                            
-                            {submittedData && (
-                                <div className="text-left inline-block bg-white p-6 rounded-lg shadow-inner border border-gray-200">
-                                    <h4 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">
-                                        Chi tiết đặt bàn (Cục bộ)
-                                    </h4>
-                                    <p><strong>Tên:</strong> {submittedData.name}</p>
-                                    <p><strong>Ngày & Giờ:</strong> {submittedData.date} lúc {submittedData.time}</p>
-                                    <p><strong>Số lượng khách:</strong> {submittedData.guests}</p>
-                                    <p><strong>Liên hệ:</strong> {submittedData.phone} / {submittedData.email}</p>
-                                    {submittedData.notes && <p><strong>Ghi chú:</strong> {submittedData.notes}</p>}
-                                </div>
-                            )}
-                            
-                            <p className="mt-4 text-sm text-red-500">
-                                (Lưu ý: Dữ liệu này KHÔNG được lưu trữ vĩnh viễn trên database.)
-                            </p>
-                            <p className="mt-1 text-sm text-gray-500">
-                                (Hệ thống sẽ tự động trở về form đặt bàn trong vài giây)
-                            </p>
-                        </div>
-                    ) : (
-                        // --- FORM ĐẶT BÀN ---
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            
-                            {/* Thông tin liên hệ */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <InputField label="Họ và Tên" name="name" icon={User} />
-                                <InputField label="Số điện thoại" name="phone" type="tel" icon={Phone} />
-                                <InputField label="Email" name="email" type="email" icon={Mail} />
+                    <div className="space-y-6 mt-10 lg:mt-0">
+                        <div className="flex items-start gap-4">
+                            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
+                                <Phone size={20} />
                             </div>
-
-                            <hr className="border-gray-200" />
-                            
-                            {/* Chi tiết đặt bàn */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <InputField 
-                                    label="Chọn Ngày" 
-                                    name="date" 
-                                    type="date" 
-                                    icon={Calendar} 
-                                    min={new Date().toISOString().split('T')[0]} 
-                                />
-                                <InputField label="Chọn Giờ" name="time" type="time" icon={Clock} />
-                                
-                                {/* Số lượng khách */}
-                                <div className="relative mb-6">
-                                    <label htmlFor="guests" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Số lượng khách
-                                    </label>
-                                    <Users className="absolute left-3 top-[37px] w-5 h-5 text-gray-400" />
-                                    <input
-                                        id="guests"
-                                        name="guests"
-                                        type="number"
-                                        value={formData.guests}
-                                        onChange={handleChange}
-                                        required
-                                        min="1"
-                                        max="10" 
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-600 focus:border-amber-600 transition duration-150 ease-in-out placeholder-gray-500 mt-1"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Ghi chú */}
                             <div>
-                                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Ghi chú thêm (Ví dụ: Yêu cầu bàn gần cửa sổ, tiệc sinh nhật...)
-                                </label>
-                                <textarea
-                                    id="notes"
-                                    name="notes"
-                                    rows="3"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-600 focus:border-amber-600 transition duration-150 ease-in-out placeholder-gray-500"
-                                    placeholder="Nhập ghi chú của bạn..."
-                                ></textarea>
+                                <p className="text-xs text-gray-400 uppercase font-bold">Hotline</p>
+                                <p className="text-lg font-bold text-white">0909.123.456</p>
                             </div>
-                            
-                            {/* Nút đặt bàn */}
-                            <div className="pt-4">
-                                <button
-                                    type="submit"
-                                    // Đã thay đổi màu nút từ bg-red-600 thành bg-amber-600 và hover:bg-amber-700
-                                    className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl shadow-lg text-lg font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition duration-200 ease-in-out transform hover:scale-[1.01] active:scale-[0.99]"
-                                >
-                                    Xác Nhận Đặt Bàn
-                                </button>
+                        </div>
+                        <div className="flex items-start gap-4">
+                            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
+                                <MapPin size={20} />
                             </div>
-                        </form>
-                    )}
+                            <div>
+                                <p className="text-xs text-gray-400 uppercase font-bold">Địa chỉ</p>
+                                <p className="text-sm text-gray-300">123 Đường ABC, Quận 1, TP.HCM</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-4">
+                            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 flex-shrink-0">
+                                <Mail size={20} />
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-400 uppercase font-bold">Email</p>
+                                <p className="text-sm text-gray-300">booking@lessence.com</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div className="mt-12 text-center text-gray-500 text-sm">
-                    Nếu bạn có bất kỳ câu hỏi nào, vui lòng gọi đến Hotline: (028) XXXX-XXXX
-                </div>
+            {/* CỘT PHẢI: FORM ĐẶT BÀN */}
+            <div className="lg:w-3/5 p-8 lg:p-12 bg-gray-800">
+                <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3 border-b border-gray-700 pb-4">
+                    <span className="text-amber-500">✦</span> Thông Tin Đặt Bàn
+                </h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Nhóm 1: Thông tin cá nhân */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="relative">
+                            <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Họ và Tên *</label>
+                            <div className="relative">
+                                <User className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                                <input 
+                                    required type="text" name="name" 
+                                    value={formData.name} onChange={handleChange} 
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all"
+                                    placeholder="VD: Nguyễn Văn A"
+                                />
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Số điện thoại *</label>
+                            <div className="relative">
+                                <Phone className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                                <input 
+                                    required type="tel" name="phone" 
+                                    value={formData.phone} onChange={handleChange} 
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all"
+                                    placeholder="090xxxxxxx"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="relative">
+                        <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Email (Nhận xác nhận)</label>
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                            <input 
+                                required type="email" name="email" 
+                                value={formData.email} onChange={handleChange} 
+                                className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all"
+                                placeholder="email@example.com"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Nhóm 2: Thời gian & Số lượng */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="relative">
+                            <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Ngày *</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                                <input 
+                                    required type="date" name="date" 
+                                    value={formData.date} onChange={handleChange} 
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Giờ *</label>
+                            <div className="relative">
+                                <Clock className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                                <input 
+                                    required type="time" name="time" 
+                                    value={formData.time} onChange={handleChange} 
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Số khách *</label>
+                            <div className="relative">
+                                <Users className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                                <input 
+                                    required type="number" min="1" max="20" name="guests" 
+                                    value={formData.guests} onChange={handleChange} 
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Nhóm 3: Ghi chú */}
+                    <div className="relative">
+                        <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Ghi chú thêm</label>
+                        <div className="relative">
+                            <FileText className="absolute left-4 top-3.5 text-gray-500" size={18} />
+                            <textarea 
+                                name="note" rows="3" 
+                                value={formData.note} onChange={handleChange} 
+                                className="w-full pl-12 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all resize-none"
+                                placeholder="VD: Tôi bị dị ứng hạt, cần ghế trẻ em..."
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <button 
+                        disabled={loading} 
+                        type="submit" 
+                        className={`w-full py-4 text-black font-bold text-lg rounded-xl shadow-lg transform transition-all duration-300 flex items-center justify-center gap-2
+                        ${loading 
+                            ? 'bg-gray-600 cursor-not-allowed text-gray-400' 
+                            : 'bg-gradient-to-r from-amber-500 to-amber-400 hover:to-amber-300 hover:scale-[1.02] shadow-amber-500/20'}`}
+                    >
+                        {loading ? 'Đang Xử Lý...' : 'XÁC NHẬN ĐẶT BÀN'}
+                    </button>
+                </form>
             </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default ReservationPage;

@@ -8,7 +8,8 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import dishRoutes from "./routes/dishRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
-//import reservationRoutes from "./routes/reservationRoutes.js";
+import dashboardRoutes from './routes/dashboardRoutes.js';
+import reservationRoutes from "./routes/reservationRoutes.js";
 //import chatbotRoutes from "./routes/chatbotRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -22,7 +23,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/dishes", dishRoutes);
 app.use("/api/orders", orderRoutes);
-//app.use("/api/reservations", reservationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use("/api/reservations", reservationRoutes);
 //app.use("/api/chatbot", chatbotRoutes);
 
 app.get("/", (req, res) => res.send("🍽️ L'ESSENCE Backend is running"));

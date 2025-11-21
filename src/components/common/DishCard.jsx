@@ -1,64 +1,65 @@
-// src/components/common/DishCard.jsx (ĐÃ THÊM PROP ẨN/HIỆN NÚT)
 import React from 'react';
-import { useCart } from '../../context/CartContext'; 
-import { Plus, Minus } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
+import { Plus, Minus, ShoppingBag } from 'lucide-react';
 
-// 1. Thêm prop "showButton = true" (mặc định là hiển thị)
-const DishCard = ({ dish, showButton = true }) => {
-  
-  // 2. Chỉ kết nối với useCart NẾU showButton là true
-  // (Không cần lấy số lượng nếu không hiển thị nút)
-  const { addItem, removeItem, getItemQuantity } = showButton ? useCart() : {};
-  const quantity = showButton ? getItemQuantity(dish._id) : 0; 
-
-  const handleAdd = () => {
-    if (addItem) addItem(dish, 1);
-  };
-  
-  const handleRemove = () => {
-    if (removeItem) removeItem(dish._id);
-  };
+const DishCard = ({ dish }) => {
+  const { addItem, removeItem, getItemQuantity } = useCart();
+  const quantity = getItemQuantity(dish._id);
 
   return (
-    <div className="bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-700
-                    flex flex-col transform hover:scale-105 transition-transform duration-300">
-      
-      <img
-        src={dish.imageURL || 'https://placehold.co/400x300'}
-        alt={dish.name}
-        className="w-full h-48 object-cover"
-      />
-      
+    <div className="bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-700 hover:border-amber-500/50 transition-all duration-300 group flex flex-col h-full">
+      {/* Hình ảnh */}
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={dish.imageURL || 'https://placehold.co/400x300?text=No+Image'}
+          alt={dish.name}
+          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+        />
+        {/* Badge giá tiền */}
+        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-amber-400 px-3 py-1 rounded-full text-sm font-bold border border-amber-500/30">
+           {dish.price.toLocaleString('vi-VN')} ₫
+        </div>
+      </div>
+
+      {/* Nội dung */}
       <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold font-serif text-amber-500 mb-2">{dish.name}</h3>
-        <p className="text-gray-400 text-sm flex-grow">{dish.description}</p>
-        
-        <div className="mt-4 flex justify-between items-center border-t border-gray-700 pt-3">
-          <span className="text-2xl font-bold text-red-500">
-            {dish.price.toLocaleString('vi-VN')} VNĐ
-          </span>
+        <div className="flex-grow">
+            <h3 className="text-lg font-bold text-white mb-1 font-serif line-clamp-1" title={dish.name}>
+            {dish.name}
+            </h3>
+            <p className="text-sm text-gray-400 line-clamp-2 mb-4 h-10">
+            {dish.description || 'Hương vị tuyệt hảo từ L\'ESSENCE.'}
+            </p>
+        </div>
 
-          {/* 3. CHỈ HIỂN THỊ NÚT NẾU showButton LÀ TRUE */}
-          {showButton && (
-            <>
-              {quantity === 0 ? (
-                <button 
-                  onClick={handleAdd} 
-                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-full"
-                >
-                  <Plus size={18}/> Thêm
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 bg-gray-900 rounded-full p-1">
-                  <button onClick={handleRemove} className="text-white hover:bg-red-600 p-1 rounded-full"><Minus size={18}/></button>
-                  <span className="text-white font-bold w-6 text-center">{quantity}</span>
-                  <button onClick={handleAdd} className="text-white hover:bg-green-600 p-1 rounded-full"><Plus size={18}/></button>
-                </div>
-              )}
-            </>
+        {/* Nút điều khiển */}
+        <div className="mt-auto pt-4 border-t border-gray-700">
+          {quantity === 0 ? (
+            <button
+              onClick={() => addItem(dish)}
+              className="w-full bg-gray-700 hover:bg-amber-600 text-white py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors font-medium group-hover:bg-amber-600"
+            >
+              <ShoppingBag size={18} /> Thêm vào giỏ
+            </button>
+          ) : (
+            <div className="flex items-center justify-between bg-gray-900 rounded-xl p-1 border border-gray-700">
+              <button
+                onClick={() => removeItem(dish._id)}
+                className="w-8 h-8 flex items-center justify-center bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all"
+              >
+                <Minus size={16} />
+              </button>
+              <span className="font-bold text-amber-500 text-lg w-8 text-center">
+                {quantity}
+              </span>
+              <button
+                onClick={() => addItem(dish)}
+                className="w-8 h-8 flex items-center justify-center bg-amber-600 text-white hover:bg-amber-500 rounded-lg transition-all shadow-lg shadow-amber-500/20"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
           )}
-          {/* Kết thúc logic ẩn/hiện nút */}
-
         </div>
       </div>
     </div>
