@@ -12,6 +12,10 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import reservationRoutes from "./routes/reservationRoutes.js";
 //import chatbotRoutes from "./routes/chatbotRoutes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+<<<<<<< HEAD
+=======
+import cartRoutes from "./routes/cartRoutes.js";
+>>>>>>> a9bd4e7433c1fa34ae5dcb508148d7c1b296435c
 
 connectDB();
 
@@ -25,6 +29,10 @@ app.use("/api/dishes", dishRoutes);
 app.use("/api/orders", orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use("/api/reservations", reservationRoutes);
+<<<<<<< HEAD
+=======
+app.use("/api/cart", cartRoutes);
+>>>>>>> a9bd4e7433c1fa34ae5dcb508148d7c1b296435c
 //app.use("/api/chatbot", chatbotRoutes);
 
 app.get("/", (req, res) => res.send("🍽️ L'ESSENCE Backend is running"));
