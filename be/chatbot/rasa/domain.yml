@@ -1,0 +1,7 @@
+intents:
+  - ask_menu
+  - ask_hours
+  - ask_reservation
+  - ask_contact
+  - greet
+  - goodbye

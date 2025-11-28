@@ -1,0 +1,27 @@
+# --- Flask Backend ---
+Flask==2.3.2
+Flask-Cors==3.0.10
+
+# --- Rasa NLU (Standalone Interpreter) ---
+rasa==3.6.20
+rasa-sdk==3.6.2
+
+# --- ML & NLP Dependencies ---
+tensorflow==2.12.0
+numpy==1.23.5
+scikit-learn==1.2.2
+pandas==1.5.3
+joblib==1.2.0
+matplotlib==3.7.1
+
+# --- Utilities ---
+requests==2.31.0
+regex==2023.6.3
+
+# --- Disable all heavy rasa server deps ---
+SQLAlchemy==1.4.46
+python-engineio==4.3.4
+python-socketio==5.7.2
+
+# --- Avoid gevent / uvloop / sanic / aiohttp ----
+# (we do NOT install rasa server; only NLU interpreter)

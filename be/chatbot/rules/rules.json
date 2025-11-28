@@ -1,0 +1,12 @@
+{
+  "hello": {
+    "keywords": ["xin chào", "hello", "hi"],
+    "reply": "Bonjour! Tôi có thể giúp gì cho bạn?",
+    "suggestions": ["Giờ mở cửa", "Menu", "Đặt bàn"]
+  },
+  "thanks": {
+    "keywords": ["cảm ơn", "thank"],
+    "reply": "Rất vui được hỗ trợ bạn!",
+    "suggestions": []
+  }
+}

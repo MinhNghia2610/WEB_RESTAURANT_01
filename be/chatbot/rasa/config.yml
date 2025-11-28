@@ -1,0 +1,9 @@
+language: vi
+
+pipeline:
+  - name: WhitespaceTokenizer
+  - name: RegexFeaturizer
+  - name: CountVectorsFeaturizer
+  - name: DIETClassifier
+    epochs: 30
+  - name: EntitySynonymMapper
