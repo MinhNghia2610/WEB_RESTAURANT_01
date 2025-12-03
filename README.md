@@ -53,6 +53,18 @@ Bạn cần cài đặt:
     *(Lưu ý: Đối với Vite, biến môi trường phải bắt đầu bằng `VITE_`)*
 
 4.  **Chạy Dự án:**
+```bash
+ 1. Tải Ollama Chatbot: https://ollama.com/
+ 2. Mở Terminal quyền Admin và chạy: ollama pull gemma2:2b
+ 3. Mở VSCode và chạy:
+ pip install -r requirements.txt
+ ollama list
+ ollama serve
+ python app.py
+
+ có thể test thử bằng : ollama run llama3
+
+5.  **Chạy Dự án:**
     ```bash
     npm run dev
     # HOẶC
