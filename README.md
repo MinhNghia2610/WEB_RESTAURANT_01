@@ -64,7 +64,7 @@ Bạn cần cài đặt:
 
  có thể test thử bằng : ollama run llama3
 
-5.  **Chạy Dự án:**
+5.  **Chạy Website:**
     ```bash
     npm run dev
     # HOẶC
